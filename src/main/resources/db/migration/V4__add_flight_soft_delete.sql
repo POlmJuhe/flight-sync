@@ -1,0 +1,1 @@
+ALTER TABLE flight ADD COLUMN deleted_at TIMESTAMP;

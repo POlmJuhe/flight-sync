@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${flight.registration} + ' · Olm Airlines'">Olm Airlines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #eef2f7;
+            --bg-card:   #ffffff;
+            --bg-hover:  #e6edf6;
+            --border:    #cdd8e6;
+            --border-hi: #a4bad0;
+            --text:      #0d1e35;
+            --muted:     #486480;
+            --faint:     #8fadc6;
+            --amber:     #c77e04;
+            --amber-dim: rgba(199,126,4,.1);
+            --sky:       #0369a1;
+            --green:     #047857;
+            --red:       #c0392b;
+            --purple:    #6d28d9;
+            --navy:      #1a3560;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            background: var(--navy);
+            box-shadow: 0 2px 16px rgba(26,53,96,.25);
+            padding: 0 1.75rem;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-btn {
+            color: rgba(255,255,255,.65);
+            text-decoration: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            transition: color .15s;
+            min-height: 44px;
+        }
+        .back-btn:hover { color: #f0c060; }
+        .sep { color: rgba(255,255,255,.2); }
+        .brand {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: .26em;
+            color: #f0c060;
+            text-transform: uppercase;
+        }
+
+        /* ── Hero ── */
+        .flight-hero {
+            background: linear-gradient(160deg, #1a3560 0%, #1e4080 50%, #152d52 100%);
+            border-bottom: none;
+            padding: 2.4rem 2rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .flight-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px; right: -60px;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(240,192,96,.08), transparent 65%);
+            pointer-events: none;
+        }
+        .registration {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: #f0c060;
+            letter-spacing: .1em;
+            line-height: 1;
+        }
+        .flight-date {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .95rem;
+            font-weight: 600;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.55);
+            margin-top: .4rem;
+        }
+        .route-display {
+            display: flex;
+            align-items: center;
+            gap: .9rem;
+            margin-top: .75rem;
+            flex-wrap: wrap;
+        }
+        .airport-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #a8d4f0;
+            letter-spacing: .06em;
+        }
+        .route-arrow {
+            color: rgba(255,255,255,.4);
+            font-size: 1.1rem;
+        }
+        .type-chip {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            padding: .3rem .85rem;
+            border-radius: 4px;
+            background: rgba(240,192,96,.15);
+            border: 1px solid rgba(240,192,96,.35);
+            color: #f0c060;
+        }
+
+        /* ── Content ── */
+        .page-content { padding: 1.75rem 2rem; }
+
+        /* ── Flash ── */
+        .flash {
+            border-radius: 8px;
+            padding: .9rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            font-size: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        .flash-ok  { background: #ecfdf5; border: 1px solid #6ee7b7; color: var(--green); }
+        .flash-err { background: #fef2f2; border: 1px solid #fca5a5; color: var(--red); }
+
+        /* ── Info cards ── */
+        .info-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.1rem 1.3rem;
+            box-shadow: 0 1px 5px rgba(26,53,96,.07);
+        }
+        .info-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--faint);
+            margin-bottom: .35rem;
+            font-weight: 700;
+        }
+        .info-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .info-value.amber { color: var(--amber); }
+        .info-value.sky   { color: var(--sky); }
+
+        /* ── Section label ── */
+        .section-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--faint);
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+        }
+        .section-label i { color: var(--amber); margin-right: .3rem; }
+
+        /* ── Timeline ── */
+        .timeline-card {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.4rem 2rem;
+            box-shadow: 0 1px 5px rgba(26,53,96,.07);
+        }
+        .tl-row { display: flex; align-items: center; }
+        .tl-point { text-align: center; flex: 1; }
+        .tl-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--amber);
+            margin: 0 auto .45rem;
+            box-shadow: 0 0 8px rgba(245,158,11,.5);
+        }
+        .tl-dot.inactive {
+            background: var(--faint);
+            box-shadow: none;
+        }
+        .tl-time {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .tl-time.muted { color: var(--muted); }
+        .tl-sub {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--faint);
+            margin-top: .2rem;
+            font-weight: 600;
+        }
+        .tl-line { flex: 2; height: 1px; background: var(--border); }
+        .tl-line.active { background: linear-gradient(90deg, var(--amber), var(--sky)); opacity: .5; }
+
+        /* ── Flags ── */
+        .flag {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            padding: .35rem .8rem;
+            border-radius: 5px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+        }
+        .flag-night  { background: rgba(167,139,250,.08); border: 1px solid rgba(167,139,250,.25); color: var(--purple); }
+        .flag-xc     { background: rgba(56,189,248,.08);  border: 1px solid rgba(56,189,248,.25);  color: var(--sky); }
+
+        /* ── Remarks ── */
+        .remarks-box {
+            background: #f7fafd;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--navy);
+            border-radius: 0 8px 8px 0;
+            padding: 1rem 1.3rem;
+            font-size: .93rem;
+            color: var(--muted);
+            font-style: italic;
+            line-height: 1.7;
+        }
+
+        /* ── Panel ── */
+        .panel {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 5px rgba(26,53,96,.07);
+        }
+        .panel-header {
+            padding: .85rem 1.2rem;
+            border-bottom: 1px solid var(--border);
+            background: #f7fafd;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--muted);
+            font-weight: 700;
+        }
+        .panel-header i { color: var(--amber); margin-right: .35rem; }
+
+        /* ── Crew table ── */
+        .crew-table { width: 100%; border-collapse: collapse; }
+        .crew-table thead th {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--faint);
+            padding: .65rem 1.1rem;
+            border-bottom: 1px solid var(--border);
+            font-weight: 700;
+        }
+        .crew-table tbody td {
+            padding: .95rem 1.1rem;
+            font-size: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .crew-table tbody tr:last-child td { border-bottom: none; }
+        .func-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .7rem;
+            font-weight: 700;
+            color: var(--amber);
+            background: var(--amber-dim);
+            padding: .15rem .5rem;
+            border-radius: 3px;
+        }
+
+        /* ── Add crew form ── */
+        .add-crew-form {
+            border-top: 1px solid var(--border);
+            padding: 1rem 1.2rem;
+            background: rgba(255,255,255,.015);
+        }
+        .add-crew-form label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            color: var(--faint);
+            margin-bottom: .25rem;
+            display: block;
+            font-weight: 700;
+        }
+        .add-crew-form input,
+        .add-crew-form select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: .9rem;
+            padding: .42rem .75rem;
+            width: 100%;
+            transition: border-color .15s;
+        }
+        .add-crew-form input:focus,
+        .add-crew-form select:focus {
+            border-color: var(--amber);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245,158,11,.12);
+        }
+        .add-crew-form select option { background: var(--bg-card); }
+        .btn-add-crew {
+            background: var(--navy);
+            color: #ffffff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            padding: .6rem 1.1rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .15s;
+            width: 100%;
+            min-height: 44px;
+        }
+        .btn-add-crew:hover { background: #24488a; }
+
+        /* ── Danger / edit actions ── */
+        .action-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: .45rem .6rem;
+            border-radius: 4px;
+            font-size: .95rem;
+            transition: background .12s, color .12s;
+            line-height: 1;
+            min-width: 36px; min-height: 36px;
+            display: inline-flex; align-items: center; justify-content: center;
+        }
+        .action-btn.edit  { color: var(--sky); }
+        .action-btn.del   { color: var(--red); }
+        .action-btn:hover { background: rgba(255,255,255,.06); }
+
+        .flight-actions {
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+        }
+        .btn-delete-flight {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--red);
+            background: transparent;
+            border: 1px solid rgba(248,113,113,.3);
+            padding: .28rem .75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            transition: background .15s, border-color .15s;
+        }
+        .btn-delete-flight:hover { background: rgba(248,113,113,.07); border-color: var(--red); }
+        .btn-edit-flight {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: transparent;
+            border: 1px solid var(--border);
+            padding: .28rem .75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+            transition: background .15s, border-color .15s, color .15s;
+        }
+        .btn-edit-flight:hover { border-color: var(--border-hi); color: var(--text); }
+
+        /* ── Modal (shared with detail page) ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-hi);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 520px;
+            animation: modal-in .2s ease;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(.96) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            padding: 1.1rem 1.4rem .9rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: .08em;
+            color: var(--text);
+        }
+        .modal-title span { color: var(--amber); }
+        .modal-close {
+            background: none; border: none; color: var(--faint);
+            font-size: 1.2rem; cursor: pointer; padding: .2rem; line-height: 1;
+            transition: color .15s;
+        }
+        .modal-close:hover { color: var(--text); }
+        .modal-body { padding: 1.3rem 1.4rem; }
+        .modal-body label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .68rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .16em; color: var(--faint);
+            display: block; margin-bottom: .28rem;
+        }
+        .modal-body input, .modal-body select {
+            background: var(--bg); border: 1px solid var(--border);
+            color: var(--text); border-radius: 6px;
+            font-family: 'Outfit', sans-serif; font-size: 1rem;
+            padding: .62rem .9rem; width: 100%; transition: border-color .15s;
+            min-height: 44px;
+        }
+        .modal-body input:focus, .modal-body select:focus {
+            border-color: var(--amber); outline: none;
+            box-shadow: 0 0 0 2px rgba(245,158,11,.12);
+        }
+        .modal-body input.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700; letter-spacing: .07em;
+        }
+        .modal-body select option { background: var(--bg-card); }
+        .modal-required { color: var(--amber); margin-left: .1rem; }
+        .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+        .modal-footer {
+            padding: .9rem 1.4rem; border-top: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: flex-end; gap: .75rem;
+        }
+        .modal-cancel {
+            background: transparent; border: 1px solid var(--border); color: var(--muted);
+            border-radius: 6px; padding: .6rem 1.3rem;
+            font-family: 'Outfit', sans-serif; font-size: 1rem; cursor: pointer;
+            transition: border-color .15s, color .15s;
+            min-height: 44px;
+        }
+        .modal-cancel:hover { border-color: var(--border-hi); color: var(--text); }
+        .modal-submit {
+            background: var(--navy); color: #ffffff; border: none;
+            border-radius: 6px; padding: .6rem 1.6rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .95rem; font-weight: 800; letter-spacing: .18em;
+            text-transform: uppercase; cursor: pointer;
+            display: flex; align-items: center; gap: .4rem;
+            transition: background .15s, box-shadow .15s;
+            min-height: 44px;
+        }
+        .modal-submit:hover { background: #24488a; box-shadow: 0 4px 14px rgba(26,53,96,.25); }
+
+        /* ── More menu ── */
+        .btn-more {
+            width: 42px; height: 42px;
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.25);
+            border-radius: 50%;
+            color: rgba(255,255,255,.75);
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            transition: border-color .15s, color .15s, background .15s;
+        }
+        .btn-more:hover { border-color: #f0c060; color: #f0c060; background: rgba(255,255,255,.18); }
+        .more-dropdown {
+            position: absolute; top: calc(100% + 7px); right: 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            min-width: 168px;
+            box-shadow: 0 12px 40px rgba(26,53,96,.2);
+            overflow: hidden;
+            display: none;
+            z-index: 50;
+            animation: dd-in .14s ease;
+        }
+        @keyframes dd-in {
+            from { opacity: 0; transform: translateY(-5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .more-dropdown.open { display: block; }
+        .dropdown-item {
+            display: flex; align-items: center; gap: .65rem;
+            padding: .85rem 1.1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            background: none; border: none; width: 100%; text-align: left;
+            color: var(--muted);
+            transition: background .1s, color .1s;
+            font-family: 'Outfit', sans-serif;
+            min-height: 48px;
+        }
+        .dropdown-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+        .dropdown-item.danger:hover { background: rgba(248,113,113,.06); color: var(--red); }
+        .dropdown-divider { height: 1px; background: var(--border); }
+
+        /* ── Carousel ── */
+        .carousel-stage {
+            position: relative;
+            background: #02030a;
+            overflow: hidden;
+            cursor: pointer;
+            height: 300px;
+        }
+        /* gradient vignette — lets counter/del sit on something */
+        .carousel-stage::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, rgba(0,0,0,.15) 0%, transparent 30%, transparent 60%, rgba(0,0,0,.55) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+        .carousel-img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity .5s ease;
+            pointer-events: none;
+        }
+        .carousel-img.active { opacity: 1; animation: kb 9s ease-out forwards; }
+        @keyframes kb {
+            from { transform: scale(1); }
+            to   { transform: scale(1.07); }
+        }
+        .carousel-arrow {
+            position: absolute;
+            top: 50%; transform: translateY(-50%);
+            z-index: 10;
+            background: rgba(0,0,0,.55);
+            border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.85);
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem;
+            transition: background .15s, color .15s, opacity .2s;
+            opacity: 0;
+            backdrop-filter: blur(6px);
+        }
+        .carousel-stage:hover .carousel-arrow { opacity: 1; }
+        .carousel-arrow:hover { background: rgba(245,158,11,.3); color: #fff; border-color: rgba(245,158,11,.5); }
+        .carousel-prev { left: .9rem; }
+        .carousel-next { right: .9rem; }
+        .carousel-counter {
+            position: absolute;
+            bottom: .7rem; left: .9rem;
+            background: rgba(0,0,0,.55);
+            color: rgba(255,255,255,.6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .7rem;
+            padding: .18rem .5rem;
+            border-radius: 3px;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+        }
+        .carousel-open-btn {
+            position: absolute;
+            bottom: .7rem; right: .9rem;
+            background: rgba(0,0,0,.55);
+            border: 1px solid rgba(255,255,255,.12);
+            color: rgba(255,255,255,.6);
+            border-radius: 4px;
+            padding: .18rem .5rem;
+            font-size: .75rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .2s;
+            backdrop-filter: blur(4px);
+            display: flex; align-items: center; gap: .3rem;
+        }
+        .carousel-stage:hover .carousel-open-btn { opacity: 1; }
+        .carousel-del-btn {
+            position: absolute;
+            top: .75rem; right: .85rem;
+            background: rgba(0,0,0,.55);
+            border: 1px solid rgba(248,113,113,.3);
+            color: var(--red);
+            border-radius: 4px;
+            padding: .18rem .5rem;
+            font-size: .78rem;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity .2s, background .12s;
+            display: flex; align-items: center; gap: .3rem;
+            backdrop-filter: blur(4px);
+        }
+        .carousel-stage:hover .carousel-del-btn { opacity: 1; }
+        .carousel-del-btn:hover { background: rgba(248,113,113,.15); }
+        .carousel-thumbs {
+            display: flex;
+            gap: .45rem;
+            padding: .7rem .9rem;
+            overflow-x: auto;
+            border-top: 1px solid var(--border);
+            background: rgba(0,0,0,.2);
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+        .carousel-thumbs::-webkit-scrollbar { height: 3px; }
+        .carousel-thumbs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+        .carousel-thumb {
+            width: 80px; height: 58px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            opacity: .4;
+            transition: opacity .2s, border-color .2s, transform .15s;
+            flex-shrink: 0;
+        }
+        .carousel-thumb.active { border-color: var(--amber); opacity: 1; transform: scale(1.05); }
+        .carousel-thumb:hover:not(.active) { opacity: .72; }
+        .carousel-empty {
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--faint);
+            font-size: .84rem;
+            display: flex; flex-direction: column; align-items: center; gap: .6rem;
+        }
+        .carousel-empty i { font-size: 2.2rem; opacity: .3; }
+        .photo-upload-form {
+            border-top: 1px solid var(--border);
+            padding: .9rem 1.1rem;
+            background: rgba(255,255,255,.012);
+            display: flex; gap: .6rem; align-items: center; flex-wrap: wrap;
+        }
+        .photo-file-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            padding: .32rem .6rem;
+            font-size: .84rem;
+            flex: 1; min-width: 0;
+        }
+        .photo-file-input::-webkit-file-upload-button {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 4px;
+            padding: .18rem .55rem;
+            cursor: pointer;
+            font-size: .78rem;
+            margin-right: .5rem;
+        }
+        .btn-upload-photo {
+            background: var(--navy);
+            color: #ffffff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 800;
+            font-size: .95rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            border: none;
+            border-radius: 6px;
+            padding: .6rem 1.3rem;
+            cursor: pointer;
+            white-space: nowrap;
+            display: flex; align-items: center; gap: .4rem;
+            transition: background .15s;
+            min-height: 44px;
+        }
+        .btn-upload-photo:hover { background: #24488a; }
+
+        /* ── Add-photo header btn ── */
+        .btn-add-photo {
+            display: inline-flex; align-items: center; gap: .4rem;
+            color: var(--faint);
+            cursor: pointer;
+            font-size: .72rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+            padding: .25rem .6rem;
+            border-radius: 4px;
+            border: 1px solid transparent;
+            transition: color .15s, border-color .15s;
+            user-select: none;
+        }
+        .btn-add-photo:hover { color: var(--amber); border-color: rgba(245,158,11,.3); }
+
+        /* ── Crew toggle ── */
+        .add-crew-toggle {
+            padding: .7rem 1.2rem;
+            border-top: 1px solid var(--border);
+            background: rgba(255,255,255,.01);
+        }
+        .btn-toggle-crew {
+            background: none; border: none;
+            color: var(--faint);
+            cursor: pointer;
+            font-size: .85rem;
+            font-family: 'Outfit', sans-serif;
+            display: flex; align-items: center; gap: .5rem;
+            padding: .3rem .35rem;
+            border-radius: 4px;
+            transition: color .15s;
+            min-height: 36px;
+        }
+        .btn-toggle-crew:hover { color: var(--amber); }
+
+        /* ── Profile avatar (same as dashboard) ── */
+        .profile-form { margin: 0; margin-left: auto; }
+        .profile-avatar-wrap {
+            display: block;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid rgba(255,255,255,.25);
+            transition: border-color .15s;
+            background: rgba(255,255,255,.12);
+            flex-shrink: 0;
+        }
+        .profile-avatar-wrap:hover { border-color: #f0c060; }
+        .profile-avatar-default {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.65); font-size: 1.15rem; pointer-events: none;
+        }
+        .profile-avatar { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block; }
+        .profile-avatar-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-size: .85rem;
+            opacity: 0; transition: opacity .15s;
+        }
+        .profile-avatar-wrap:hover .profile-avatar-overlay { opacity: 1; }
+
+        /* ── Mobile ── */
+        @media (max-width: 767px) {
+            .topbar { padding: 0 1rem; }
+            .back-btn { font-size: .95rem; }
+
+            .flight-hero { padding: 1.5rem 1rem 1.2rem; }
+            .registration { font-size: 2.2rem; }
+            .airport-code { font-size: 1.2rem; }
+
+            .page-content { padding: 1rem; }
+
+            /* Timeline: scroll horizontally instead of squishing */
+            .timeline-card { padding: 1.2rem 1rem; overflow-x: auto; }
+            .tl-row { min-width: 340px; }
+            .tl-time { font-size: 1rem; }
+
+            /* Info cards */
+            .info-value { font-size: 1.4rem; }
+
+            /* Crew table cells bigger touch targets */
+            .crew-table tbody td { padding: .9rem .8rem; font-size: 1rem; }
+            .crew-table thead th { padding: .6rem .8rem; }
+            .add-crew-form { padding: 1rem; }
+            .add-crew-form input,
+            .add-crew-form select { font-size: 1rem; padding: .6rem .75rem; min-height: 44px; }
+
+            /* Carousel: smaller on mobile, arrows always visible */
+            .carousel-stage { height: 210px; }
+            .carousel-arrow { opacity: .85; width: 44px; height: 44px; }
+            .carousel-del-btn { opacity: 1; }
+            .carousel-open-btn { opacity: 1; }
+            .carousel-thumbs { padding: .6rem .8rem; }
+
+            /* Photo upload */
+            .photo-upload-form { flex-direction: column; align-items: stretch; }
+            .photo-file-input { font-size: .95rem; }
+
+            /* Modal: full-width on mobile */
+            .modal-overlay { padding: .5rem; align-items: flex-end; }
+            .modal-box { border-radius: 14px 14px 0 0; max-width: 100%; }
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-body { padding: 1.1rem 1.1rem; }
+            .modal-footer { padding: .85rem 1.1rem; }
+            .modal-body input,
+            .modal-body select { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <a href="/" class="back-btn"><i class="bi bi-chevron-left"></i> Tornar</a>
+    <span class="sep">|</span>
+    <span class="brand"><i class="bi bi-compass"></i> Olm Airlines</span>
+    <form class="profile-form" action="/profile-image" method="post" enctype="multipart/form-data">
+        <label class="profile-avatar-wrap" title="Canviar foto de perfil">
+            <span class="profile-avatar-default"><i class="bi bi-person-fill"></i></span>
+            <img src="/profile-image" class="profile-avatar" alt=""
+                 onerror="this.style.display='none'">
+            <span class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></span>
+            <input type="file" name="file" accept="image/jpeg,image/png"
+                   style="display:none" onchange="this.form.submit()">
+        </label>
+    </form>
+</div>
+
+<div class="flight-hero">
+    <div class="container-fluid">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+            <div>
+                <div class="registration" th:text="${flight.registration}">EC-XXX</div>
+                <div class="flight-date"
+                     th:text="${#temporals.format(flight.departureTime, 'EEEE, dd MMM yyyy')}"></div>
+                <div class="route-display">
+                    <span class="airport-code"
+                          th:text="${flight.route.split(' → ')[0]}"></span>
+                    <i class="bi bi-airplane route-arrow"></i>
+                    <span class="airport-code"
+                          th:text="${flight.route.split(' → ')[1]}"></span>
+                </div>
+            </div>
+            <div class="flight-actions" style="align-items:center">
+                <span class="type-chip" th:text="${flight.flightType}">INSTR</span>
+                <div style="position:relative">
+                    <button class="btn-more" onclick="toggleMore()" title="Opciones">
+                        <i class="bi bi-three-dots"></i>
+                    </button>
+                    <div class="more-dropdown" id="moreDropdown">
+                        <a th:href="@{/flights/{id}/edit(id=${flight.id})}" class="dropdown-item">
+                            <i class="bi bi-pencil"></i> Editar vol
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form th:action="@{/flights/{id}/delete(id=${flight.id})}" method="post"
+                              onsubmit="return confirm('Eliminar aquest vol? No es pot desfer.')">
+                            <button type="submit" class="dropdown-item danger">
+                                <i class="bi bi-trash"></i> Eliminar vol
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="page-content">
+
+    <div th:if="${successMessage}" class="flash flash-ok">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="flash flash-err">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Key stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="info-card">
+                <div class="info-label">Durada del vol</div>
+                <div class="info-value amber" th:text="${flight.duration}">—</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="info-card">
+                <div class="info-label">Temps bloc</div>
+                <div class="info-value" th:text="${flight.blockTime}">—</div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="info-card">
+                <div class="info-label">Distància</div>
+                <div class="info-value sky">
+                    <span th:text="${flight.distanceKm}">0</span>
+                    <span style="font-size:.85rem;font-weight:400;color:var(--muted)"> km</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="info-card">
+                <div class="info-label">Aterratges</div>
+                <div class="info-value" th:text="${flight.nbLandings}">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-card mb-4">
+        <div class="section-label"><i class="bi bi-clock-history"></i>Cronologia del vol</div>
+        <div class="tl-row">
+            <div class="tl-point">
+                <div class="tl-dot inactive"></div>
+                <div class="tl-time muted"
+                     th:text="${flight.blockStart != null} ? ${#temporals.format(flight.blockStart, 'HH:mm')} : '—'">—</div>
+                <div class="tl-sub">Bloc sortida</div>
+            </div>
+            <div class="tl-line"></div>
+            <div class="tl-point">
+                <div class="tl-dot"></div>
+                <div class="tl-time"
+                     th:text="${flight.departureTime != null} ? ${#temporals.format(flight.departureTime, 'HH:mm')} : '—'">—</div>
+                <div class="tl-sub">Enlairament</div>
+            </div>
+            <div class="tl-line active"></div>
+            <div class="tl-point">
+                <div class="tl-dot"></div>
+                <div class="tl-time"
+                     th:text="${flight.landingTime != null} ? ${#temporals.format(flight.landingTime, 'HH:mm')} : '—'">—</div>
+                <div class="tl-sub">Aterratge</div>
+            </div>
+            <div class="tl-line"></div>
+            <div class="tl-point">
+                <div class="tl-dot inactive"></div>
+                <div class="tl-time muted"
+                     th:text="${flight.blockEnd != null} ? ${#temporals.format(flight.blockEnd, 'HH:mm')} : '—'">—</div>
+                <div class="tl-sub">Bloc arribada</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photos carousel -->
+    <div class="panel mb-4" style="overflow:hidden">
+        <div class="panel-header d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-images"></i>Fotos</span>
+            <label class="btn-add-photo" for="photoFileInput" title="Afegir foto">
+                <i class="bi bi-plus-circle"></i> Afegir foto
+            </label>
+        </div>
+        <div id="carouselMount"></div>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Crew: full width -->
+        <div class="col-12">
+            <div class="panel">
+                <div class="panel-header"><i class="bi bi-people-fill"></i>Tripulació</div>
+                <table class="crew-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Funció</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${flight.crew.isEmpty()}">
+                            <td colspan="3"
+                                style="text-align:center;color:var(--faint);padding:1.5rem;font-size:.85rem">
+                                Sense tripulació registrada
+                            </td>
+                        </tr>
+                        <tr th:each="member : ${flight.crew}">
+                            <td th:text="${member.fullName}"></td>
+                            <td><span class="func-tag" th:text="${member.function}"></span></td>
+                            <td style="white-space:nowrap;text-align:right">
+                                <button type="button" class="action-btn edit"
+                                        th:attr="data-crew-id=${member.id},data-fname=${member.firstName},data-lname=${member.lastName},data-func=${member.function}"
+                                        onclick="openEditCrewFromBtn(this)">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form th:action="@{/flights/{id}/crew/{cid}/delete(id=${flight.id},cid=${member.id})}"
+                                      method="post" style="display:inline">
+                                    <button type="submit" class="action-btn del"
+                                            onclick="return confirm('Eliminar tripulant?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="add-crew-toggle">
+                    <button type="button" class="btn-toggle-crew" id="btnToggleCrew" onclick="toggleCrewForm()">
+                        <i class="bi bi-plus-circle"></i> Afegir tripulant
+                    </button>
+                </div>
+                <div class="add-crew-form" id="addCrewFormWrap" style="display:none">
+                    <form th:action="@{/flights/{id}/crew(id=${flight.id})}"
+                          th:object="${crewForm}" method="post">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-4">
+                                <label>Nom</label>
+                                <input type="text" th:field="*{firstName}" placeholder="Pau">
+                            </div>
+                            <div class="col-md-4">
+                                <label>Cognom</label>
+                                <input type="text" th:field="*{lastName}" placeholder="Garcia">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Funció</label>
+                                <select th:field="*{function}">
+                                    <option value="">—</option>
+                                    <option value="PIC">PIC</option>
+                                    <option value="SIC">SIC</option>
+                                    <option value="STU">STU</option>
+                                    <option value="INS">INS</option>
+                                    <option value="OBS">OBS</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label style="visibility:hidden">·</label>
+                                <button type="submit" class="btn-add-crew">
+                                    <i class="bi bi-person-plus-fill"></i> Guardar
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<!-- Hidden forms -->
+<form id="deleteImageForm"
+      th:action="@{/flights/{id}/images/delete(id=${flight.id})}" method="post"
+      style="display:none">
+    <input type="hidden" name="filename" id="deleteImageFilename">
+</form>
+<form id="addPhotoForm"
+      th:action="@{/flights/{id}/images(id=${flight.id})}" method="post"
+      enctype="multipart/form-data" style="display:none">
+    <input type="file" id="photoFileInput" name="file" accept="image/jpeg,image/png">
+</form>
+
+<!-- Edit flight modal -->
+<div class="modal-overlay" id="editFlightModal" onclick="closeOnBackdrop(event,'editFlightModal')">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title"><span><i class="bi bi-pencil"></i></span> Editar vol</div>
+            <button class="modal-close" onclick="closeModal('editFlightModal')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form th:action="@{/flights/{id}/edit(id=${flight.id})}" th:object="${editForm}" method="post">
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div>
+                        <label>Matrícula <span class="modal-required">*</span></label>
+                        <input type="text" name="registration" class="mono"
+                               th:value="${flight.registration}" autocomplete="off">
+                    </div>
+                    <div>
+                        <label>Tipus de vol <span class="modal-required">*</span></label>
+                        <select name="flightType">
+                            <option th:each="ft : ${flightTypes}"
+                                    th:value="${ft.name()}"
+                                    th:text="${ft.label}"
+                                    th:selected="${ft.name() == flight.flightTypeKey}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Sortida <span class="modal-required">*</span></label>
+                        <select name="departureAirport">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="airport : ${airports}"
+                                    th:value="${airport.key}"
+                                    th:text="${airport.key} + ' — ' + ${airport.value}"
+                                    th:selected="${airport.key == flight.departureAirportCode}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Arribada <span class="modal-required">*</span></label>
+                        <select name="arrivalAirport">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="airport : ${airports}"
+                                    th:value="${airport.key}"
+                                    th:text="${airport.key} + ' — ' + ${airport.value}"
+                                    th:selected="${airport.key == flight.arrivalAirportCode}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Enlairament <span class="modal-required">*</span></label>
+                        <input type="datetime-local" name="departureTime"
+                               th:value="${#temporals.format(flight.departureTime, 'yyyy-MM-dd''T''HH:mm')}">
+                    </div>
+                    <div>
+                        <label>Aterratge <span class="modal-required">*</span></label>
+                        <input type="datetime-local" name="landingTime"
+                               th:value="${#temporals.format(flight.landingTime, 'yyyy-MM-dd''T''HH:mm')}">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-cancel" onclick="closeModal('editFlightModal')">Cancel·lar</button>
+                <button type="submit" class="modal-submit"><i class="bi bi-check-lg"></i> Desar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Edit crew modal -->
+<div class="modal-overlay" id="editCrewModal" onclick="closeOnBackdrop(event,'editCrewModal')">
+    <div class="modal-box" style="max-width:420px">
+        <div class="modal-header">
+            <div class="modal-title"><span><i class="bi bi-person-fill"></i></span> Editar tripulant</div>
+            <button class="modal-close" onclick="closeModal('editCrewModal')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form id="editCrewForm" method="post">
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div>
+                        <label>Nom</label>
+                        <input type="text" name="firstName" id="editCrewFirstName">
+                    </div>
+                    <div>
+                        <label>Cognom</label>
+                        <input type="text" name="lastName" id="editCrewLastName">
+                    </div>
+                    <div style="grid-column:1/-1">
+                        <label>Funció</label>
+                        <select name="function" id="editCrewFunction">
+                            <option value="PIC">PIC</option>
+                            <option value="SIC">SIC</option>
+                            <option value="STU">STU</option>
+                            <option value="INS">INS</option>
+                            <option value="OBS">OBS</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-cancel" onclick="closeModal('editCrewModal')">Cancel·lar</button>
+                <button type="submit" class="modal-submit"><i class="bi bi-check-lg"></i> Desar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    var flightId = /*[[${flight.id}]]*/ '';
+    var IMAGES   = /*[[${images}]]*/ [];
+
+    /* ── Add photo: auto-submit on file select ── */
+    document.getElementById('photoFileInput').addEventListener('change', function() {
+        if (this.files.length > 0) document.getElementById('addPhotoForm').submit();
+    });
+
+    /* ── Crew form toggle ── */
+    function toggleCrewForm() {
+        var wrap = document.getElementById('addCrewFormWrap');
+        var btn  = document.getElementById('btnToggleCrew');
+        var open = wrap.style.display !== 'none';
+        wrap.style.display = open ? 'none' : 'block';
+        btn.querySelector('i').className = open ? 'bi bi-plus-circle' : 'bi bi-x-circle';
+        btn.querySelector('i').style.color = open ? '' : 'var(--red)';
+    }
+
+    /* ── Modals ── */
+    function openEditFlight() {
+        document.getElementById('editFlightModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function openEditCrewFromBtn(btn) {
+        document.getElementById('editCrewFirstName').value = btn.getAttribute('data-fname');
+        document.getElementById('editCrewLastName').value  = btn.getAttribute('data-lname');
+        document.getElementById('editCrewFunction').value  = btn.getAttribute('data-func');
+        document.getElementById('editCrewForm').action     = '/flights/' + flightId + '/crew/' + btn.getAttribute('data-crew-id') + '/edit';
+        document.getElementById('editCrewModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+        document.getElementById(id).classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function closeOnBackdrop(e, id) {
+        if (e.target === document.getElementById(id)) closeModal(id);
+    }
+
+    /* ── More menu ── */
+    function toggleMore() {
+        document.getElementById('moreDropdown').classList.toggle('open');
+    }
+    function closeMore() {
+        document.getElementById('moreDropdown').classList.remove('open');
+    }
+    document.addEventListener('click', function(e) {
+        var dd = document.getElementById('moreDropdown');
+        if (dd && !dd.contains(e.target) && !e.target.closest('.btn-more')) {
+            dd.classList.remove('open');
+        }
+    });
+
+    /* ── Carousel ── */
+    (function() {
+        var mount = document.getElementById('carouselMount');
+        if (!IMAGES.length) {
+            mount.innerHTML = '<div class="carousel-empty"><i class="bi bi-camera"></i><span>Sense fotos encara</span></div>';
+            return;
+        }
+        var cur = 0;
+        var base = '/flight-images/' + flightId + '/';
+
+        /* build stage */
+        var stage = document.createElement('div');
+        stage.className = 'carousel-stage';
+
+        var imgs = IMAGES.map(function(name, i) {
+            var el = document.createElement('img');
+            el.className = 'carousel-img' + (i === 0 ? ' active' : '');
+            el.src = base + 'orig_' + name;
+            el.alt = 'Foto ' + (i + 1);
+            stage.appendChild(el);
+            return el;
+        });
+
+        /* open original on click */
+        stage.addEventListener('click', function(e) {
+            if (e.target.closest('.carousel-arrow') || e.target.closest('.carousel-del-btn') || e.target.closest('.carousel-open-btn')) return;
+            window.open(base + 'orig_' + IMAGES[cur], '_blank');
+        });
+
+        /* arrows */
+        var prev = document.createElement('button');
+        prev.className = 'carousel-arrow carousel-prev';
+        prev.innerHTML = '<i class="bi bi-chevron-left"></i>';
+        prev.addEventListener('click', function(e) { e.stopPropagation(); go(cur - 1); });
+
+        var next = document.createElement('button');
+        next.className = 'carousel-arrow carousel-next';
+        next.innerHTML = '<i class="bi bi-chevron-right"></i>';
+        next.addEventListener('click', function(e) { e.stopPropagation(); go(cur + 1); });
+
+        /* counter */
+        var counter = document.createElement('div');
+        counter.className = 'carousel-counter';
+
+        /* open button */
+        var openBtn = document.createElement('button');
+        openBtn.type = 'button';
+        openBtn.className = 'carousel-open-btn';
+        openBtn.innerHTML = '<i class="bi bi-arrows-fullscreen"></i> Veure original';
+        openBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            window.open(base + 'orig_' + IMAGES[cur], '_blank');
+        });
+
+        /* delete button */
+        var delBtn = document.createElement('button');
+        delBtn.type = 'button';
+        delBtn.className = 'carousel-del-btn';
+        delBtn.innerHTML = '<i class="bi bi-trash"></i> Eliminar foto';
+        delBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (!confirm('Eliminar aquesta foto?')) return;
+            document.getElementById('deleteImageFilename').value = IMAGES[cur];
+            document.getElementById('deleteImageForm').submit();
+        });
+
+        stage.appendChild(prev);
+        stage.appendChild(next);
+        stage.appendChild(counter);
+        stage.appendChild(openBtn);
+        stage.appendChild(delBtn);
+        mount.appendChild(stage);
+
+        /* thumbnails */
+        var thumbsRow = document.createElement('div');
+        thumbsRow.className = 'carousel-thumbs';
+        var thumbEls = IMAGES.map(function(name, i) {
+            var t = document.createElement('img');
+            t.className = 'carousel-thumb' + (i === 0 ? ' active' : '');
+            t.src = base + 'thumb_' + name;
+            t.alt = '';
+            t.addEventListener('click', function() { go(i); });
+            thumbsRow.appendChild(t);
+            return t;
+        });
+        mount.appendChild(thumbsRow);
+
+        /* touch swipe */
+        var touchX = 0;
+        stage.addEventListener('touchstart', function(e) { touchX = e.touches[0].clientX; }, {passive:true});
+        stage.addEventListener('touchend', function(e) {
+            var diff = touchX - e.changedTouches[0].clientX;
+            if (Math.abs(diff) > 45) go(diff > 0 ? cur + 1 : cur - 1);
+        });
+
+        function go(idx) {
+            idx = ((idx % IMAGES.length) + IMAGES.length) % IMAGES.length;
+            imgs[cur].classList.remove('active');
+            thumbEls[cur].classList.remove('active');
+            cur = idx;
+            /* restart Ken Burns animation */
+            imgs[cur].style.animation = 'none';
+            imgs[cur].offsetWidth; /* force reflow */
+            imgs[cur].style.animation = '';
+            imgs[cur].classList.add('active');
+            thumbEls[cur].classList.add('active');
+            counter.textContent = (cur + 1) + ' / ' + IMAGES.length;
+            thumbEls[cur].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+        go(0);
+    })();
+
+    /* ── Keyboard ── */
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            ['editFlightModal','editCrewModal'].forEach(closeModal);
+            closeMore();
+        }
+        if (e.key === 'ArrowLeft'  && !document.querySelector('.modal-overlay.open')) document.querySelector('.carousel-prev')?.click();
+        if (e.key === 'ArrowRight' && !document.querySelector('.modal-overlay.open')) document.querySelector('.carousel-next')?.click();
+    });
+</script>
+</body>
+</html>

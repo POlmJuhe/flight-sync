@@ -1,0 +1,233 @@
+[
+  {
+    "icaoCode": "LECF",
+    "name": "Calaf/Sallavinera",
+    "type": 2,
+    "lat": 41.744722222222,
+    "lng": 1.5572222222222,
+    "runways": [
+      {"designator": "31", "trueHeading": 310, "mainRunway": true, "mainComposite": 13},
+      {"designator": "13", "trueHeading": 130, "mainRunway": true, "mainComposite": 13}
+    ],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEHG",
+    "name": "Hospital General de Catalunya",
+    "type": 7,
+    "lat": 41.474,
+    "lng": 2.042,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEHM",
+    "name": "Hospital General de Manresa",
+    "type": 7,
+    "lat": 41.72,
+    "lng": 1.841,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEJC",
+    "name": "Hotel Rey Juan Carlos I",
+    "type": 7,
+    "lat": 41.380833333333,
+    "lng": 2.1083333333333,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LESP",
+    "name": "Hospital San Pau",
+    "type": 7,
+    "lat": 41.414,
+    "lng": 2.172,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEJD",
+    "name": "Sant Joan de Déu",
+    "type": 7,
+    "lat": 41.38445862805233,
+    "lng": 2.102658762790128,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEMS",
+    "name": "Manresa",
+    "type": 2,
+    "lat": 41.765277777778,
+    "lng": 1.8619444444444,
+    "runways": [
+      {"designator": "28", "trueHeading": 280, "mainRunway": true, "mainComposite": 13},
+      {"designator": "10", "trueHeading": 100, "mainRunway": true, "mainComposite": 13}
+    ],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LENH",
+    "name": "Nou Hospital de Mataró",
+    "type": 7,
+    "lat": 41.561,
+    "lng": 2.43,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEJL",
+    "name": "Germans Trias i Pujol",
+    "type": 7,
+    "lat": 41.479638888888886,
+    "lng": 2.2385,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LETA",
+    "name": "Circuit de Catalunya",
+    "type": 7,
+    "lat": 41.574,
+    "lng": 2.257,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LERA",
+    "name": "R.A.C.C. Barcelona",
+    "type": 7,
+    "lat": 41.381388888889,
+    "lng": 2.1072222222222,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LELL",
+    "name": "Sabadell",
+    "type": 9,
+    "lat": 41.520833333333,
+    "lng": 2.105,
+    "runways": [
+      {"designator": "13", "trueHeading": 127, "mainRunway": true, "mainComposite": 0},
+      {"designator": "31", "trueHeading": 307, "mainRunway": true, "mainComposite": 0}
+    ],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEUL",
+    "name": "Ullastrell-Teresa Vilá",
+    "type": 7,
+    "lat": 41.524,
+    "lng": 1.972,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LERV",
+    "name": "Circuit de Catalunya (Evacuació)",
+    "type": 7,
+    "lat": 41.572,
+    "lng": 2.262,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LETM",
+    "name": "Sant Martí de Sescorts",
+    "type": 7,
+    "lat": 42.016,
+    "lng": 2.319,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LERG",
+    "name": "Berga",
+    "type": 7,
+    "lat": 42.106,
+    "lng": 1.853,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEPY",
+    "name": "El Portinyol",
+    "type": 7,
+    "lat": 41.584,
+    "lng": 2.561,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEIG",
+    "name": "Igualada/Odena",
+    "type": 2,
+    "lat": 41.585555555556,
+    "lng": 1.6530555555556,
+    "runways": [
+      {"designator": "34", "trueHeading": 340, "mainRunway": true, "mainComposite": 0},
+      {"designator": "16", "trueHeading": 160, "mainRunway": true, "mainComposite": 0}
+    ],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEGE",
+    "name": "Girona",
+    "type": 9,
+    "lat": 41.904444444444,
+    "lng": 2.7619444444444,
+    "runways": [
+      {"designator": "19", "trueHeading": 194, "mainRunway": true, "mainComposite": 0},
+      {"designator": "01", "trueHeading": 14, "mainRunway": true, "mainComposite": 0}
+    ],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEFS",
+    "name": "Fortalesa de Sant Julià de Ramis",
+    "type": 7,
+    "lat": 42.03076462750232,
+    "lng": 2.8487746650098416,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEBC",
+    "name": "Costa Brava-Centro Heliport",
+    "type": 7,
+    "lat": 41.808,
+    "lng": 3.037,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEJT",
+    "name": "Hospital Doctor Josep Trueta",
+    "type": 7,
+    "lat": 41.998,
+    "lng": 2.821,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEMV",
+    "name": "Parc de Bombers de Maçanet de la Selva",
+    "type": 7,
+    "lat": 41.77934836742844,
+    "lng": 2.75228705522548,
+    "runways": [],
+    "frequencies": []
+  },
+  {
+    "icaoCode": "LEOR",
+    "name": "Parque de Bomberos de Orriols",
+    "type": 7,
+    "lat": 42.132,
+    "lng": 2.904,
+    "runways": [],
+    "frequencies": []
+  }
+]

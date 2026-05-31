@@ -1,0 +1,7 @@
+ALTER TABLE flight
+    ADD COLUMN block_start   TIMESTAMP,
+    ADD COLUMN block_end     TIMESTAMP,
+    ADD COLUMN nb_landings   INTEGER NOT NULL DEFAULT 0,
+    ADD COLUMN night         BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN cross_country BOOLEAN NOT NULL DEFAULT FALSE,
+    ADD COLUMN remarks       VARCHAR(500);

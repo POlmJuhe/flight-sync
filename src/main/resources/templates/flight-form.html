@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${editMode} ? 'Editar vol · Olm Airlines' : 'Nou vol · Olm Airlines'">Vol · Olm Airlines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #eef2f7;
+            --bg-card:   #ffffff;
+            --border:    #cdd8e6;
+            --border-hi: #a4bad0;
+            --text:      #0d1e35;
+            --muted:     #486480;
+            --faint:     #8fadc6;
+            --amber:     #c77e04;
+            --amber-dim: rgba(199,126,4,.1);
+            --sky:       #0369a1;
+            --green:     #047857;
+            --red:       #c0392b;
+            --navy:      #1a3560;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            min-height: 100vh;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            background: var(--navy);
+            box-shadow: 0 2px 16px rgba(26,53,96,.25);
+            padding: 0 1.75rem;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .back-btn {
+            color: rgba(255,255,255,.65);
+            text-decoration: none;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            transition: color .15s;
+            min-height: 44px;
+        }
+        .back-btn:hover { color: #f0c060; }
+        .sep { color: rgba(255,255,255,.2); }
+        .brand {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: .26em;
+            color: #f0c060;
+            text-transform: uppercase;
+        }
+
+        /* ── Page layout ── */
+        .page { max-width: 720px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+        /* ── Page title ── */
+        .page-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: .05em;
+            color: var(--navy);
+            margin-bottom: 1.75rem;
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+        }
+        .page-title i { color: var(--amber); font-size: 1.6rem; }
+
+        /* ── Section card ── */
+        .section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 2px 8px rgba(26,53,96,.06);
+        }
+        .section-header {
+            padding: .75rem 1.4rem;
+            background: #f7fafd;
+            border-bottom: 1px solid var(--border);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .2em;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        .section-header i { color: var(--amber); }
+        .section-body { padding: 1.4rem; }
+
+        /* ── Form grid ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-grid .full { grid-column: 1 / -1; }
+
+        /* ── Field ── */
+        .field label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            color: var(--faint);
+            display: block;
+            margin-bottom: .3rem;
+        }
+        .field label .req { color: var(--amber); margin-left: .1rem; }
+        .field input,
+        .field select,
+        .field textarea {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05rem;
+            padding: .7rem 1rem;
+            width: 100%;
+            min-height: 48px;
+            transition: border-color .15s, box-shadow .15s;
+        }
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--amber);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(199,126,4,.1);
+        }
+        .field input.mono,
+        .field .mono { font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: .07em; }
+        .field textarea { min-height: 90px; resize: vertical; line-height: 1.55; }
+        .field select option { background: var(--bg-card); }
+
+        /* ── Checkboxes ── */
+        .checks-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            cursor: pointer;
+            min-height: 48px;
+        }
+        .check-item input[type="checkbox"] {
+            width: 22px; height: 22px;
+            accent-color: var(--amber);
+            cursor: pointer;
+            flex-shrink: 0;
+            min-height: unset;
+        }
+        .check-item span {
+            font-size: 1.05rem;
+            color: var(--text);
+        }
+
+        /* ── Actions ── */
+        .form-actions {
+            display: flex;
+            gap: .85rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+        .btn-submit {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            background: var(--navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: .75rem 2rem;
+            min-height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+            transition: background .15s, box-shadow .15s;
+        }
+        .btn-submit:hover { background: #24488a; box-shadow: 0 4px 16px rgba(26,53,96,.25); }
+        .btn-cancel {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .14em;
+            text-transform: uppercase;
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: .75rem 1.5rem;
+            min-height: 50px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            transition: border-color .15s, color .15s;
+        }
+        .btn-cancel:hover { border-color: var(--border-hi); color: var(--text); }
+
+        /* ── Mobile ── */
+        @media (max-width: 600px) {
+            .topbar { padding: 0 1rem; }
+            .page { padding: 1.25rem 1rem 3rem; }
+            .page-title { font-size: 1.6rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .section-body { padding: 1rem; }
+            .btn-submit, .btn-cancel { min-height: 54px; font-size: 1.05rem; }
+            .form-actions { flex-direction: column; align-items: stretch; }
+            .form-actions a, .form-actions button { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <a th:href="${editMode} ? @{/flights/{id}(id=${flightId})} : '/'" class="back-btn">
+        <i class="bi bi-chevron-left"></i> Tornar
+    </a>
+    <span class="sep">|</span>
+    <span class="brand"><i class="bi bi-compass"></i> Olm Airlines</span>
+</div>
+
+<div class="page">
+
+    <div class="page-title">
+        <i th:class="${editMode} ? 'bi bi-pencil-square' : 'bi bi-plus-circle-fill'"></i>
+        <span th:text="${editMode} ? 'Editar vol' : 'Nou vol'">Nou vol</span>
+    </div>
+
+    <form th:action="${editMode} ? @{/flights/{id}/edit(id=${flightId})} : @{/admin/flights}"
+          th:object="${form}" method="post">
+
+        <!-- Identificació -->
+        <div class="section">
+            <div class="section-header"><i class="bi bi-tag-fill"></i> Identificació</div>
+            <div class="section-body">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Matrícula <span class="req">*</span></label>
+                        <input type="text" th:field="*{registration}" class="mono"
+                               placeholder="EC-ERV" autocomplete="off">
+                    </div>
+                    <div class="field">
+                        <label>Tipus de vol <span class="req">*</span></label>
+                        <select th:field="*{flightType}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="ft : ${flightTypes}"
+                                    th:value="${ft.name()}"
+                                    th:text="${ft.label}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ruta -->
+        <div class="section">
+            <div class="section-header"><i class="bi bi-airplane-fill"></i> Ruta</div>
+            <div class="section-body">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Aeroport de sortida <span class="req">*</span></label>
+                        <select th:field="*{departureAirport}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="a : ${airports}"
+                                    th:value="${a.key}"
+                                    th:text="${a.key} + ' — ' + ${a.value}"></option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Aeroport d'arribada <span class="req">*</span></label>
+                        <select th:field="*{arrivalAirport}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="a : ${airports}"
+                                    th:value="${a.key}"
+                                    th:text="${a.key} + ' — ' + ${a.value}"></option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label>Distància <span style="font-weight:400;text-transform:none;letter-spacing:0">(km)</span></label>
+                        <input type="number" th:field="*{distanceKm}" min="0" placeholder="0">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Horaris -->
+        <div class="section">
+            <div class="section-header"><i class="bi bi-clock-fill"></i> Horaris</div>
+            <div class="section-body">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Bloc sortida</label>
+                        <input type="datetime-local" th:field="*{blockStart}">
+                    </div>
+                    <div class="field">
+                        <label>Enlairament <span class="req">*</span></label>
+                        <input type="datetime-local" th:field="*{departureTime}">
+                    </div>
+                    <div class="field">
+                        <label>Aterratge <span class="req">*</span></label>
+                        <input type="datetime-local" th:field="*{landingTime}">
+                    </div>
+                    <div class="field">
+                        <label>Bloc arribada</label>
+                        <input type="datetime-local" th:field="*{blockEnd}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detalls -->
+        <div class="section">
+            <div class="section-header"><i class="bi bi-bar-chart-fill"></i> Detalls</div>
+            <div class="section-body">
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Nombre d'aterratges</label>
+                        <input type="number" th:field="*{nbLandings}" min="0" placeholder="0">
+                    </div>
+                    <div class="field" style="display:flex;flex-direction:column;justify-content:flex-end">
+                        <label style="margin-bottom:.6rem">Condicions</label>
+                        <div class="checks-row">
+                            <label class="check-item">
+                                <input type="checkbox" th:field="*{night}">
+                                <span><i class="bi bi-moon-stars-fill" style="color:#6d28d9;margin-right:.25rem"></i> Nocturn</span>
+                            </label>
+                            <label class="check-item">
+                                <input type="checkbox" th:field="*{crossCountry}">
+                                <span><i class="bi bi-globe-americas" style="color:#0369a1;margin-right:.25rem"></i> Cross-country</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Observacions -->
+        <div class="section">
+            <div class="section-header"><i class="bi bi-chat-text-fill"></i> Observacions</div>
+            <div class="section-body">
+                <div class="field">
+                    <label>Remarks</label>
+                    <textarea th:field="*{remarks}" placeholder="Notes sobre el vol..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit">
+                <i th:class="${editMode} ? 'bi bi-check-lg' : 'bi bi-plus-lg'"></i>
+                <span th:text="${editMode} ? 'Desar canvis' : 'Crear vol'">Crear vol</span>
+            </button>
+            <a th:href="${editMode} ? @{/flights/{id}(id=${flightId})} : '/'" class="btn-cancel">
+                <i class="bi bi-x-lg"></i> Cancel·lar
+            </a>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // Auto-uppercase matricula
+    document.querySelector('input[name="registration"]').addEventListener('input', function() {
+        this.value = this.value.toUpperCase();
+    });
+</script>
+</body>
+</html>

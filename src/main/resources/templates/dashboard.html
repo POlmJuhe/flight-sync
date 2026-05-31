@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olm Airlines</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --bg:        #eef2f7;
+            --bg-card:   #ffffff;
+            --bg-hover:  #e6edf6;
+            --border:    #cdd8e6;
+            --border-hi: #a4bad0;
+            --text:      #0d1e35;
+            --muted:     #486480;
+            --faint:     #8fadc6;
+            --amber:     #c77e04;
+            --amber-dim: rgba(199,126,4,.1);
+            --sky:       #0369a1;
+            --green:     #047857;
+            --red:       #c0392b;
+            --navy:      #1a3560;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--navy);
+            box-shadow: 0 2px 16px rgba(26,53,96,.25);
+            padding: 0 1.75rem;
+            height: 58px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .brand {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: .28em;
+            color: #f0c060;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: .7rem;
+        }
+        .brand-beacon {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #f0c060;
+            box-shadow: 0 0 0 0 rgba(240,192,96,.5);
+            animation: beacon 2.4s ease-in-out infinite;
+        }
+        @keyframes beacon {
+            0%   { box-shadow: 0 0 0 0 rgba(240,192,96,.5); }
+            60%  { box-shadow: 0 0 0 6px rgba(240,192,96,0); }
+            100% { box-shadow: 0 0 0 0 rgba(240,192,96,0); }
+        }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .topbar-date {
+            color: rgba(255,255,255,.55);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .72rem;
+            letter-spacing: .05em;
+        }
+
+        /* ── Profile avatar ── */
+        .profile-form { margin: 0; }
+        .profile-avatar-wrap {
+            display: block;
+            width: 38px; height: 38px;
+            border-radius: 50%;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            border: 2px solid rgba(255,255,255,.25);
+            transition: border-color .15s;
+            background: rgba(255,255,255,.12);
+            flex-shrink: 0;
+        }
+        .profile-avatar-wrap:hover { border-color: #f0c060; }
+        .profile-avatar-default {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.65);
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+        .profile-avatar {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+            display: block;
+        }
+        .profile-avatar-overlay {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,.45);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff;
+            font-size: .85rem;
+            opacity: 0;
+            transition: opacity .15s;
+        }
+        .profile-avatar-wrap:hover .profile-avatar-overlay { opacity: 1; }
+        .btn-import {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .92rem;
+            font-weight: 700;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: var(--navy);
+            background: #f0c060;
+            padding: .55rem 1.1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            min-height: 40px;
+            transition: background .15s, box-shadow .15s;
+        }
+        .btn-import:hover {
+            background: #f5d080;
+            box-shadow: 0 0 12px rgba(240,192,96,.4);
+        }
+
+        /* ── Content ── */
+        .content { padding: 1.75rem; }
+
+        /* ── Flash ── */
+        .flash {
+            border-radius: 8px;
+            padding: .85rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: .55rem;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .flash-ok  { background: #ecfdf5; border: 1px solid #6ee7b7; color: var(--green); }
+        .flash-err { background: #fef2f2; border: 1px solid #fca5a5; color: var(--red); }
+
+        /* ── Stat cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+        @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 520px) { .stats-grid { grid-template-columns: 1fr 1fr; } }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.35rem 1.5rem 1.1rem;
+            position: relative;
+            overflow: hidden;
+            transition: border-color .2s, transform .2s, box-shadow .2s;
+            animation: lift-in .45s ease backwards;
+            box-shadow: 0 2px 8px rgba(26,53,96,.07);
+        }
+        .stat-card:nth-child(1) { animation-delay: .04s; }
+        .stat-card:nth-child(2) { animation-delay: .1s; }
+        .stat-card:nth-child(3) { animation-delay: .16s; }
+        .stat-card:nth-child(4) { animation-delay: .22s; }
+        @keyframes lift-in {
+            from { opacity: 0; transform: translateY(10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--amber);
+            border-radius: 8px 0 0 8px;
+        }
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 110px; height: 110px;
+            background: radial-gradient(circle, var(--amber-dim), transparent 70%);
+            pointer-events: none;
+            transition: opacity .2s;
+        }
+        .stat-card:hover {
+            border-color: var(--navy);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26,53,96,.15);
+        }
+        .stat-icon {
+            font-size: .95rem;
+            color: var(--amber);
+            opacity: .75;
+            margin-bottom: .65rem;
+        }
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.15rem;
+            font-weight: 700;
+            line-height: 1;
+            color: var(--text);
+        }
+        .stat-value .unit {
+            font-size: .88rem;
+            font-weight: 400;
+            color: var(--muted);
+            margin-left: .15rem;
+        }
+        .stat-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--muted);
+            margin-top: .55rem;
+            font-weight: 600;
+        }
+
+        /* ── Panel ── */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            animation: lift-in .45s .28s ease backwards;
+            box-shadow: 0 2px 10px rgba(26,53,96,.07);
+        }
+        .panel-header {
+            padding: .9rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            background: #f7fafd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .panel-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .18em;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: .45rem;
+        }
+        .panel-title i { color: var(--amber); }
+        .panel-badge {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .68rem;
+            color: var(--faint);
+            letter-spacing: .04em;
+        }
+
+        /* ── Table ── */
+        .flight-table { width: 100%; border-collapse: collapse; }
+        .flight-table thead th {
+            padding: .7rem 1.2rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            color: var(--faint);
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .flight-table tbody tr {
+            border-bottom: 1px solid rgba(24,37,58,.7);
+            cursor: pointer;
+            transition: background .1s;
+        }
+        .flight-table tbody tr:last-child { border-bottom: none; }
+        .flight-table tbody tr:hover { background: #edf4fb; }
+        .flight-table tbody tr:hover td:first-child { box-shadow: inset 3px 0 0 var(--navy); }
+        .flight-table tbody td {
+            padding: 1rem 1.2rem;
+            vertical-align: middle;
+            font-size: 1rem;
+        }
+        .td-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .9rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .td-reg {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--amber);
+            letter-spacing: .07em;
+            white-space: nowrap;
+        }
+        .td-route {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .95rem;
+            color: var(--sky);
+            white-space: nowrap;
+        }
+        .td-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .9rem;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .crew-row {
+            font-size: .9rem;
+            color: var(--muted);
+            line-height: 1.8;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--muted);
+        }
+        .empty-state i {
+            font-size: 2.4rem;
+            display: block;
+            margin-bottom: .8rem;
+            color: var(--border);
+        }
+        .empty-state p { font-size: .83rem; }
+
+        /* ── Pagination ── */
+        .pager {
+            display: flex;
+            gap: .25rem;
+            justify-content: center;
+            padding: .85rem;
+            border-top: 1px solid var(--border);
+        }
+        .page-btn {
+            font-family: 'JetBrains Mono', monospace;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 5px;
+            padding: .5rem .9rem;
+            font-size: .85rem;
+            text-decoration: none;
+            line-height: 1.4;
+            min-height: 40px;
+            display: inline-flex;
+            align-items: center;
+            transition: border-color .12s, color .12s;
+        }
+        .page-btn:hover { border-color: var(--amber); color: var(--amber); }
+        .page-btn.active {
+            background: var(--amber);
+            border-color: var(--amber);
+            color: var(--bg);
+            font-weight: 700;
+        }
+        .page-btn.disabled { opacity: .2; pointer-events: none; }
+
+        /* ── Filter bar ── */
+        .filter-bar {
+            display: flex;
+            gap: .6rem;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .filter-select {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .82rem;
+            font-weight: 600;
+            letter-spacing: .06em;
+            padding: .42rem .75rem;
+            min-height: 36px;
+            cursor: pointer;
+            transition: border-color .15s;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238fadc6' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right .65rem center;
+            padding-right: 2rem;
+        }
+        .filter-select:focus { border-color: var(--amber); outline: none; }
+        .filter-select.active { border-color: var(--amber); background-color: var(--amber-dim); color: var(--text); }
+        .filter-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .15em;
+            color: var(--faint);
+            white-space: nowrap;
+        }
+        .btn-clear-filters {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .78rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: .38rem .8rem;
+            min-height: 36px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: .3rem;
+            transition: border-color .15s, color .15s;
+        }
+        .btn-clear-filters:hover { border-color: var(--red); color: var(--red); }
+        .filter-count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .68rem;
+            color: var(--amber);
+            background: var(--amber-dim);
+            border: 1px solid rgba(199,126,4,.2);
+            border-radius: 3px;
+            padding: .1rem .4rem;
+        }
+
+        /* ── New-flight button ── */
+        .btn-new-flight {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .92rem;
+            font-weight: 700;
+            letter-spacing: .15em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.85);
+            background: transparent;
+            border: 1px solid rgba(255,255,255,.3);
+            padding: .55rem 1.1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            min-height: 40px;
+            transition: background .15s, border-color .15s;
+        }
+        .btn-new-flight:hover {
+            background: rgba(255,255,255,.1);
+            border-color: rgba(255,255,255,.6);
+            color: #fff;
+        }
+
+        /* ── Modal overlay ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,.7);
+            backdrop-filter: blur(4px);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.open { display: flex; }
+
+        .modal-box {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            width: 100%;
+            max-width: 520px;
+            box-shadow: 0 20px 60px rgba(26,53,96,.2);
+            animation: modal-in .2s ease;
+        }
+        @keyframes modal-in {
+            from { opacity: 0; transform: scale(.96) translateY(8px); }
+            to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal-header {
+            padding: 1.2rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .modal-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: .1em;
+            color: var(--text);
+        }
+        .modal-title span { color: var(--amber); }
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--faint);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: .2rem;
+            line-height: 1;
+            transition: color .15s;
+        }
+        .modal-close:hover { color: var(--text); }
+
+        .modal-body { padding: 1.4rem 1.5rem; }
+
+        .modal-body label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            color: var(--faint);
+            display: block;
+            margin-bottom: .28rem;
+        }
+        .modal-body input,
+        .modal-body select {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            padding: .62rem .9rem;
+            width: 100%;
+            min-height: 44px;
+            transition: border-color .15s;
+        }
+        .modal-body input:focus,
+        .modal-body select:focus {
+            border-color: var(--amber);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(245,158,11,.12);
+        }
+        .modal-body input.mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            letter-spacing: .07em;
+        }
+        .modal-body select option { background: var(--bg-card); }
+        .modal-required { color: var(--amber); margin-left: .1rem; }
+        .modal-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .85rem;
+        }
+        .modal-grid .full { grid-column: 1 / -1; }
+
+        .modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: .75rem;
+        }
+        .modal-cancel {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 6px;
+            padding: .62rem 1.4rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            min-height: 44px;
+            transition: border-color .15s, color .15s;
+        }
+        .modal-cancel:hover { border-color: var(--border-hi); color: var(--text); }
+        .modal-submit {
+            background: var(--navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            padding: .62rem 1.7rem;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .95rem;
+            font-weight: 800;
+            letter-spacing: .18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+            min-height: 44px;
+            transition: background .15s, box-shadow .15s;
+        }
+        .modal-submit:hover {
+            background: #24488a;
+            box-shadow: 0 4px 16px rgba(26,53,96,.3);
+        }
+        /* ── Mobile menu button ── */
+        .btn-mobile-menu {
+            display: none;
+            background: rgba(255,255,255,.1);
+            border: 1px solid rgba(255,255,255,.22);
+            color: rgba(255,255,255,.85);
+            border-radius: 7px;
+            width: 40px; height: 40px;
+            align-items: center; justify-content: center;
+            font-size: 1.15rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background .15s, border-color .15s;
+        }
+        .btn-mobile-menu:hover { background: rgba(255,255,255,.18); border-color: #f0c060; color: #f0c060; }
+
+        /* ── Mobile dropdown ── */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 58px; left: 0; right: 0;
+            background: var(--navy);
+            border-bottom: 2px solid rgba(240,192,96,.35);
+            z-index: 99;
+            padding: .5rem .75rem .75rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,.35);
+            animation: slide-down .2s ease;
+        }
+        @keyframes slide-down {
+            from { opacity: 0; transform: translateY(-8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .mobile-nav.open { display: block; }
+        .mobile-nav-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .68rem;
+            color: rgba(255,255,255,.35);
+            letter-spacing: .05em;
+            padding: .3rem .25rem .6rem;
+        }
+        .mobile-nav-item {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+            width: 100%;
+            padding: .75rem 1rem;
+            border-radius: 7px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,.8);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .12s, color .12s;
+            min-height: 48px;
+        }
+        .mobile-nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+        .mobile-nav-item.accent { color: var(--navy); background: #f0c060; }
+        .mobile-nav-item.accent:hover { background: #f5d080; }
+        .mobile-nav-divider { height: 1px; background: rgba(255,255,255,.08); margin: .3rem 0; }
+
+        /* ── Mobile (portrait + landscape) ── */
+        @media (max-width: 768px) {
+            .topbar { padding: 0 1rem; }
+            .topbar-date { display: none; }
+            .topbar-right { gap: .65rem; }
+
+            /* Hide desktop action buttons, show hamburger */
+            .btn-new-flight, .btn-import { display: none; }
+            .btn-mobile-menu { display: flex; }
+
+            /* Mobile nav offset matches topbar height */
+            .mobile-nav { top: 58px; }
+        }
+
+        /* ── Small screens (portrait phones only) ── */
+        @media (max-width: 640px) {
+            .content { padding: 1rem; }
+
+            /* Hide secondary table columns */
+            .flight-table thead th:nth-child(4),
+            .flight-table thead th:nth-child(5),
+            .flight-table thead th:nth-child(6),
+            .flight-table tbody td:nth-child(4),
+            .flight-table tbody td:nth-child(5),
+            .flight-table tbody td:nth-child(6) { display: none; }
+
+            .flight-table tbody td { padding: 1rem .85rem; }
+            .flight-table thead th { padding: .7rem .85rem; }
+
+            .stat-card { padding: 1rem 1rem .85rem; }
+            .stat-value { font-size: 1.75rem; }
+
+            /* Modal: sheet from bottom */
+            .modal-overlay { padding: .5rem; align-items: flex-end; }
+            .modal-box { border-radius: 14px 14px 0 0; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+            .modal-grid { grid-template-columns: 1fr; }
+            .modal-body { padding: 1.1rem; }
+            .modal-footer { padding: .9rem 1.1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <i class="bi bi-compass"></i>
+        Olm Airlines
+        <div class="brand-beacon"></div>
+    </div>
+    <div class="topbar-right">
+        <span class="topbar-date"
+              th:text="${#temporals.format(#temporals.createNow(), 'dd MMM yyyy · HH:mm')}"></span>
+        <a href="/flights/new" class="btn-new-flight">
+            <i class="bi bi-plus-lg"></i> Nou vol
+        </a>
+        <button class="btn-new-flight" onclick="openCarnet()" title="Generar carnet de pilot">
+            <i class="bi bi-person-badge"></i> Carnet
+        </button>
+        <a href="/admin" class="btn-import">
+            <i class="bi bi-upload"></i> Importar
+        </a>
+        <form class="profile-form" action="/profile-image" method="post" enctype="multipart/form-data">
+            <label class="profile-avatar-wrap" title="Canviar foto de perfil">
+                <span class="profile-avatar-default"><i class="bi bi-person-fill"></i></span>
+                <img src="/profile-image" class="profile-avatar" alt=""
+                     onerror="this.style.display='none'">
+                <span class="profile-avatar-overlay"><i class="bi bi-camera-fill"></i></span>
+                <input type="file" name="file" accept="image/jpeg,image/png"
+                       style="display:none" onchange="this.form.submit()">
+            </label>
+        </form>
+        <button class="btn-mobile-menu" onclick="toggleMobileMenu()" aria-label="Menú">
+            <i class="bi bi-list" id="mobileMenuIcon"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Mobile nav dropdown -->
+<div class="mobile-nav" id="mobileNav">
+    <div class="mobile-nav-date"
+         th:text="${#temporals.format(#temporals.createNow(), 'dd MMM yyyy · HH:mm')}"></div>
+    <a href="/flights/new" class="mobile-nav-item accent">
+        <i class="bi bi-plus-lg"></i> Nou vol
+    </a>
+    <button class="mobile-nav-item" onclick="openCarnet(); closeMobileMenu()">
+        <i class="bi bi-person-badge"></i> Carnet de pilot
+    </button>
+    <div class="mobile-nav-divider"></div>
+    <a href="/admin" class="mobile-nav-item">
+        <i class="bi bi-upload"></i> Importar vols
+    </a>
+</div>
+
+<div class="content">
+
+    <div th:if="${successMessage}" class="flash flash-ok">
+        <i class="bi bi-check-circle-fill"></i>
+        <span th:text="${successMessage}"></span>
+    </div>
+    <div th:if="${errorMessage}" class="flash flash-err">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+        <span th:text="${errorMessage}"></span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-airplane-fill"></i></div>
+            <div class="stat-value" th:text="${stats.totalFlights}">0</div>
+            <div class="stat-label">Vols totals</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-value" th:text="${stats.totalFlightTime}">0h 00m</div>
+            <div class="stat-label">Hores volades</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-globe-americas"></i></div>
+            <div class="stat-value">
+                <span th:text="${stats.totalDistanceKm}">0</span><span class="unit">km</span>
+            </div>
+            <div class="stat-label">Distància total</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-award-fill"></i></div>
+            <div class="stat-value td-reg" style="font-size:1.55rem" th:text="${stats.mostUsedAircraft}">—</div>
+            <div class="stat-label">Aeronau més usada</div>
+        </div>
+    </div>
+
+    <!-- Filter bar -->
+    <form method="get" action="/" class="filter-bar" id="filterForm">
+        <span class="filter-label"><i class="bi bi-funnel-fill"></i> Filtrar</span>
+
+        <select name="year" class="filter-select"
+                th:classappend="${currentYear != null} ? 'active'"
+                onchange="document.getElementById('filterForm').submit()">
+            <option value="">Tots els anys</option>
+            <option th:each="y : ${distinctYears}"
+                    th:value="${y}"
+                    th:text="${y}"
+                    th:selected="${y == currentYear}"></option>
+        </select>
+
+        <select name="registration" class="filter-select"
+                th:classappend="${currentRegistration != null} ? 'active'"
+                onchange="document.getElementById('filterForm').submit()">
+            <option value="">Totes les matrícules</option>
+            <option th:each="r : ${distinctRegistrations}"
+                    th:value="${r}"
+                    th:text="${r}"
+                    th:selected="${r == currentRegistration}"></option>
+        </select>
+
+        <select name="flightType" class="filter-select"
+                th:classappend="${currentFlightType != null} ? 'active'"
+                onchange="document.getElementById('filterForm').submit()">
+            <option value="">Tots els tipus</option>
+            <option value="INSTR" th:selected="${currentFlightType == 'INSTR'}">Instrucció</option>
+            <option value="SOLO"  th:selected="${currentFlightType == 'SOLO'}">Sol</option>
+        </select>
+
+        <select name="airport" class="filter-select"
+                th:classappend="${currentAirport != null} ? 'active'"
+                onchange="document.getElementById('filterForm').submit()">
+            <option value="">Tots els aeroports</option>
+            <option th:each="a : ${airports}"
+                    th:value="${a.key}"
+                    th:text="${a.key + ' — ' + a.value}"
+                    th:selected="${a.key == currentAirport}"></option>
+        </select>
+
+        <a th:if="${currentYear != null or currentRegistration != null or currentFlightType != null or currentAirport != null}"
+           href="/" class="btn-clear-filters">
+            <i class="bi bi-x-lg"></i> Netejar
+        </a>
+    </form>
+
+    <!-- Flights panel -->
+    <div class="panel">
+        <div class="panel-header">
+            <div class="panel-title">
+                <i class="bi bi-journal-text"></i>
+                Registre de vols
+            </div>
+            <span class="panel-badge" th:text="${flights.totalElements} + ' entrades'"></span>
+        </div>
+
+        <div style="overflow-x:auto">
+            <table class="flight-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Matrícula</th>
+                        <th>Ruta</th>
+                        <th>Dist.</th>
+                        <th>Durada</th>
+                        <th>Tripulació</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${flights.isEmpty()}">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="bi bi-wind"></i>
+                                <p>Sense vols registrats. Importa un JSON per començar.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr th:each="f : ${flights}"
+                        th:data-href="@{/flights/{id}(id=${f.id})}">
+                        <td class="td-date"
+                            th:text="${#temporals.format(f.date, 'dd/MM/yyyy')}"></td>
+                        <td><span class="td-reg" th:text="${f.registration}"></span></td>
+                        <td><span class="td-route" th:text="${f.route}"></span></td>
+                        <td class="td-num" th:text="${f.distanceKm + ' km'}"></td>
+                        <td class="td-num" th:text="${f.duration}"></td>
+                        <td>
+                            <div class="crew-row" th:each="member : ${f.crew}" th:text="${member}"></div>
+                            <span th:if="${f.crew.isEmpty()}" style="color:var(--faint)">—</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${flights.totalPages > 1}" class="pager">
+            <a class="page-btn"
+               th:classappend="${flights.first} ? 'disabled'"
+               th:href="@{/(page=${flights.number - 1}, year=${currentYear}, registration=${currentRegistration}, flightType=${currentFlightType}, airport=${currentAirport})}">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            <a class="page-btn"
+               th:each="i : ${#numbers.sequence(0, flights.totalPages - 1)}"
+               th:classappend="${i == flights.number} ? 'active'"
+               th:href="@{/(page=${i}, year=${currentYear}, registration=${currentRegistration}, flightType=${currentFlightType}, airport=${currentAirport})}"
+               th:text="${i + 1}"></a>
+            <a class="page-btn"
+               th:classappend="${flights.last} ? 'disabled'"
+               th:href="@{/(page=${flights.number + 1}, year=${currentYear}, registration=${currentRegistration}, flightType=${currentFlightType}, airport=${currentAirport})}">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
+    </div>
+
+</div>
+
+<!-- New flight modal -->
+<div class="modal-overlay" id="newFlightModal" onclick="closeOnBackdrop(event)">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div class="modal-title"><span>+</span> Nou vol</div>
+            <button class="modal-close" onclick="closeNewFlight()"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <form th:action="@{/admin/flights}" th:object="${form}" method="post">
+            <div class="modal-body">
+                <div class="modal-grid">
+                    <div>
+                        <label>Matrícula <span class="modal-required">*</span></label>
+                        <input type="text" th:field="*{registration}" class="mono"
+                               placeholder="EC-ERV" autocomplete="off">
+                    </div>
+                    <div>
+                        <label>Tipus de vol <span class="modal-required">*</span></label>
+                        <select th:field="*{flightType}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="ft : ${flightTypes}"
+                                    th:value="${ft.name()}"
+                                    th:text="${ft.label}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Sortida <span class="modal-required">*</span></label>
+                        <select th:field="*{departureAirport}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="airport : ${airports}"
+                                    th:value="${airport.key}"
+                                    th:text="${airport.key} + ' — ' + ${airport.value}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Arribada <span class="modal-required">*</span></label>
+                        <select th:field="*{arrivalAirport}">
+                            <option value="">— Selecciona —</option>
+                            <option th:each="airport : ${airports}"
+                                    th:value="${airport.key}"
+                                    th:text="${airport.key} + ' — ' + ${airport.value}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Enlairament <span class="modal-required">*</span></label>
+                        <input type="datetime-local" th:field="*{departureTime}">
+                    </div>
+                    <div>
+                        <label>Aterratge <span class="modal-required">*</span></label>
+                        <input type="datetime-local" th:field="*{landingTime}">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="modal-cancel" onclick="closeNewFlight()">Cancel·lar</button>
+                <button type="submit" class="modal-submit">
+                    <i class="bi bi-check-lg"></i> Crear
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Carnet modal -->
+<div class="modal-overlay" id="carnetModal" onclick="closeCarnetOnBackdrop(event)">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:1.2rem;width:100%;max-width:540px;padding:0 .5rem">
+
+        <!-- Card captured by html2canvas -->
+        <div id="carnetCard" style="
+            width:100%;
+            background:#ffffff;
+            border:2px solid #cdd8e6;
+            border-radius:16px;
+            overflow:hidden;
+            font-family:'Outfit',sans-serif;
+            color:#0d1e35;
+            box-shadow:0 8px 32px rgba(26,53,96,.18);
+        ">
+            <!-- Navy header band -->
+            <div style="background:#1a3560;padding:1.4rem 1.8rem;display:flex;align-items:center;gap:1.2rem">
+                <div id="carnetAvatar" style="width:80px;height:80px;border-radius:50%;border:3px solid #f0c060;flex-shrink:0;background-size:cover;background-position:center;background-color:#243d6a"></div>
+                <div style="flex:1;min-width:0">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.28em;color:#f0c060;text-transform:uppercase;margin-bottom:.2rem">Olm Airlines</div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:1.9rem;font-weight:800;letter-spacing:.05em;line-height:1;color:#ffffff">DIARI DE VOL</div>
+                    <div style="font-size:.9rem;color:rgba(255,255,255,.6);margin-top:.3rem">Pilot des de <span id="carnetSince" style="color:#f0c060;font-weight:600">—</span></div>
+                </div>
+                <div style="text-align:right;flex-shrink:0">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:rgba(255,255,255,.3);letter-spacing:.08em">OLM-001</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:#f0c060;margin-top:.2rem" id="carnetDate">—</div>
+                </div>
+            </div>
+
+            <!-- Amber accent line -->
+            <div style="height:4px;background:linear-gradient(90deg,#c77e04,#f0c060,#c77e04)"></div>
+
+            <!-- Main stats: 3 cols -->
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:#f7fafd">
+                <div style="text-align:center;padding:1.4rem .5rem 1.2rem;border-right:1px solid #cdd8e6">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:2.6rem;font-weight:700;color:#c77e04;line-height:1" id="carnetFlights">—</div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#486480;margin-top:.4rem">Vols totals</div>
+                </div>
+                <div style="text-align:center;padding:1.4rem .5rem 1.2rem;border-right:1px solid #cdd8e6">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:1.7rem;font-weight:700;color:#0d1e35;line-height:1;padding-top:.45rem" id="carnetTime">—</div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#486480;margin-top:.4rem">Hores de vol</div>
+                </div>
+                <div style="text-align:center;padding:1.4rem .5rem 1.2rem">
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:1.8rem;font-weight:700;color:#0369a1;line-height:1;padding-top:.3rem" id="carnetKm">—</div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#486480;margin-top:.4rem">Quilòmetres</div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:1px;background:#cdd8e6"></div>
+
+            <!-- Secondary: aeronau + aeroport -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;background:#ffffff">
+                <div style="padding:1.1rem 1.5rem;border-right:1px solid #cdd8e6">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8fadc6;margin-bottom:.35rem">Aeronau més usada</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;color:#c77e04;letter-spacing:.07em" id="carnetAircraft">—</div>
+                </div>
+                <div style="padding:1.1rem 1.5rem">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#8fadc6;margin-bottom:.35rem">Aeroport més visitat</div>
+                    <div style="font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;color:#0369a1;letter-spacing:.07em" id="carnetAirport">—</div>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div style="height:1px;background:#cdd8e6"></div>
+
+            <!-- Solo / Instrucció bar -->
+            <div style="padding:1.1rem 1.5rem;background:#ffffff">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem">
+                    <div style="display:flex;align-items:center;gap:.5rem">
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#047857">Sol</span>
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:700;color:#047857" id="carnetSolo">—</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:.5rem">
+                        <span style="font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:700;color:#6d28d9" id="carnetInstr">—</span>
+                        <span style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#6d28d9">Instrucció</span>
+                    </div>
+                </div>
+                <div style="height:8px;border-radius:4px;background:#eef2f7;overflow:hidden;border:1px solid #cdd8e6">
+                    <div id="carnetBar" style="height:100%;background:linear-gradient(90deg,#047857,#6d28d9);border-radius:4px;transition:width .4s ease;width:50%"></div>
+                </div>
+            </div>
+
+            <!-- Footer navy strip -->
+            <div style="background:#1a3560;padding:.65rem 1.5rem;display:flex;align-items:center;justify-content:space-between">
+                <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.4)">OLM AIRLINES · CARNET DE PILOT</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:rgba(240,192,96,.4)">✦ ✦ ✦</div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:.75rem">
+            <button onclick="downloadCarnet()"
+                    style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;background:#c77e04;color:#ffffff;border:none;border-radius:7px;padding:.7rem 1.6rem;cursor:pointer;display:flex;align-items:center;gap:.45rem;min-height:46px">
+                <i class="bi bi-download"></i> Descarregar PNG
+            </button>
+            <button onclick="closeCarnet()"
+                    style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:.7rem 1.4rem;cursor:pointer;min-height:46px">
+                Tancar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelectorAll('[data-href]').forEach(function (row) {
+        row.addEventListener('click', function () {
+            window.location.href = this.dataset.href;
+        });
+    });
+
+    // ── Mobile menu ──
+    function toggleMobileMenu() {
+        var nav  = document.getElementById('mobileNav');
+        var icon = document.getElementById('mobileMenuIcon');
+        var open = nav.classList.toggle('open');
+        icon.className = open ? 'bi bi-x-lg' : 'bi bi-list';
+    }
+    function closeMobileMenu() {
+        document.getElementById('mobileNav').classList.remove('open');
+        document.getElementById('mobileMenuIcon').className = 'bi bi-list';
+    }
+    document.addEventListener('click', function(e) {
+        var nav = document.getElementById('mobileNav');
+        if (nav.classList.contains('open') &&
+            !nav.contains(e.target) &&
+            !e.target.closest('.btn-mobile-menu')) {
+            closeMobileMenu();
+        }
+    });
+
+    function openNewFlight() {
+        document.getElementById('newFlightModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeNewFlight() {
+        document.getElementById('newFlightModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+    function closeOnBackdrop(e) {
+        if (e.target === document.getElementById('newFlightModal')) closeNewFlight();
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeNewFlight();
+    });
+
+    // Auto-uppercase ICAO inputs inside modal
+    document.querySelectorAll('#newFlightModal input.mono').forEach(function(input) {
+        input.addEventListener('input', function() { this.value = this.value.toUpperCase(); });
+    });
+
+    // ── Carnet ──
+    function openCarnet() {
+        // Pre-load profile image as base64 so html2canvas renders it correctly
+        fetch('/profile-image')
+            .then(function(r) { return r.ok ? r.blob() : null; })
+            .then(function(blob) {
+                if (blob) {
+                    var url = URL.createObjectURL(blob);
+                    document.getElementById('carnetAvatar').style.backgroundImage = 'url(' + url + ')';
+                }
+            })
+            .catch(function() {});
+
+        fetch('/carnet')
+            .then(function(r) { return r.json(); })
+            .then(function(d) {
+                document.getElementById('carnetFlights').textContent  = d.totalFlights;
+                document.getElementById('carnetTime').textContent     = d.totalFlightTime;
+                document.getElementById('carnetKm').textContent       = d.totalDistanceKm.toLocaleString() + ' km';
+                document.getElementById('carnetAircraft').textContent = d.mostUsedAircraft;
+                document.getElementById('carnetAirport').textContent  = d.topAirport;
+                document.getElementById('carnetSince').textContent    = d.pilotSince;
+                document.getElementById('carnetSolo').textContent     = d.soloFlights;
+                document.getElementById('carnetInstr').textContent    = d.instrFlights;
+                document.getElementById('carnetDate').textContent     = new Date().toLocaleDateString('ca-ES');
+
+                var total = d.soloFlights + d.instrFlights;
+                var soloPct = total > 0 ? (d.soloFlights / total * 100) : 50;
+                document.getElementById('carnetBar').style.width = soloPct + '%';
+
+                document.getElementById('carnetModal').classList.add('open');
+                document.body.style.overflow = 'hidden';
+            });
+    }
+
+    function closeCarnet() {
+        document.getElementById('carnetModal').classList.remove('open');
+        document.body.style.overflow = '';
+    }
+
+    function closeCarnetOnBackdrop(e) {
+        if (e.target === document.getElementById('carnetModal')) closeCarnet();
+    }
+
+    function downloadCarnet() {
+        var card = document.getElementById('carnetCard');
+        html2canvas(card, { scale: 2, backgroundColor: null, useCORS: true }).then(function(canvas) {
+            var link = document.createElement('a');
+            link.download = 'olm-airlines-carnet.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') { closeNewFlight(); closeCarnet(); closeMobileMenu(); }
+    });
+</script>
+</body>
+</html>
