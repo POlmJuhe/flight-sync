@@ -22,7 +22,9 @@ services:
     environment:
       DB_URL:      jdbc:postgresql://postgres:5432/flightdashboard
       DB_USER:     flight
-      DB_PASSWORD: flight123
+      DB_PASSWORD: ${DB_PASSWORD:-flight123}
+      APP_USERNAME: ${APP_USERNAME:-admin}
+      APP_PASSWORD: ${APP_PASSWORD:-changeme}
     depends_on:
       postgres:
         condition: service_healthy
