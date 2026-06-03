@@ -25,9 +25,12 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-flight123}
       APP_USERNAME: ${APP_USERNAME:-admin}
       APP_PASSWORD: ${APP_PASSWORD:-changeme}
+    volumes:
+      - flight_images:/data/flight-images
     depends_on:
       postgres:
         condition: service_healthy
 
 volumes:
   pgdata:
+  flight_images:
