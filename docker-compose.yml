@@ -4,7 +4,7 @@ services:
     environment:
       POSTGRES_DB:       flightdashboard
       POSTGRES_USER:     flight
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-flight123}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
     ports:
       - "5432:5432"
     volumes:
@@ -22,9 +22,9 @@ services:
     environment:
       DB_URL:      jdbc:postgresql://postgres:5432/flightdashboard
       DB_USER:     flight
-      DB_PASSWORD: ${DB_PASSWORD:-flight123}
-      APP_USERNAME: ${APP_USERNAME:-admin}
-      APP_PASSWORD: ${APP_PASSWORD:-changeme}
+      DB_PASSWORD: ${DB_PASSWORD}
+      APP_USERNAME: ${APP_USERNAME}
+      APP_PASSWORD: ${APP_PASSWORD}
     volumes:
       - flight_images:/data/flight-images
     depends_on:

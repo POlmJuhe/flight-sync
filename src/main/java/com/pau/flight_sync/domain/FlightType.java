@@ -1,9 +1,9 @@
 package com.pau.flight_sync.domain;
 
 public enum FlightType {
-    INSTR("Con instructor"),
-    SOLO("Solo"),
-    UNKNOWN("Desconocido");
+    INSTR("Amb instructor"),
+    SOLO("Sol"),
+    UNKNOWN("Desconegut");
 
     private final String label;
 
