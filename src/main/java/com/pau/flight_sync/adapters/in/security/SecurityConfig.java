@@ -27,7 +27,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/profile-image").permitAll()
+                .requestMatchers("/login", "/profile-image", "/apple-touch-icon.png", "/apple-touch-icon-precomposed.png", "/site.webmanifest", "/favicon.svg").permitAll()
                 .anyRequest().authenticated())
             .formLogin(form -> form
                 .loginPage("/login")

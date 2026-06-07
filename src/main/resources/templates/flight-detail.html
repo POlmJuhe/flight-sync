@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${flight.registration} + ' · Olm Airlines'">Olm Airlines</title>
     <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link rel="apple-touch-icon" th:href="@{/apple-touch-icon.png}">
+    <link rel="manifest" th:href="@{/site.webmanifest}">
+    <meta name="theme-color" content="#1a3560">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Olm Airlines">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -817,10 +823,14 @@
 
             .page-content { padding: 1rem; }
 
-            /* Timeline: scroll horizontally instead of squishing */
-            .timeline-card { padding: 1.2rem 1rem; overflow-x: auto; }
-            .tl-row { min-width: 340px; }
-            .tl-time { font-size: 1rem; }
+            /* Timeline: 2×2 grid on mobile */
+            .timeline-card { padding: 1rem; overflow-x: visible; }
+            .tl-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; min-width: 0; }
+            .tl-line { display: none; }
+            .tl-point { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: .75rem .9rem; text-align: left; display: flex; flex-direction: column; }
+            .tl-dot { margin: 0 0 .4rem 0; }
+            .tl-time { font-size: 1.05rem; }
+            .tl-sub { font-size: .68rem; }
 
             /* Info cards */
             .info-value { font-size: 1.35rem; }
@@ -843,9 +853,9 @@
             .photo-upload-form { flex-direction: column; align-items: stretch; }
             .photo-file-input { font-size: .95rem; }
 
-            /* Modal: sheet from bottom */
-            .modal-overlay { padding: .5rem; align-items: flex-end; }
-            .modal-box { border-radius: 14px 14px 0 0; max-width: 100%; max-height: 90vh; overflow-y: auto; }
+            /* Modal: centred on mobile */
+            .modal-overlay { padding: .75rem; align-items: center; }
+            .modal-box { border-radius: 14px; max-width: 100%; max-height: 90vh; overflow-y: auto; }
             .modal-grid { grid-template-columns: 1fr; }
             .modal-body { padding: 1.1rem 1.1rem; }
             .modal-footer { padding: .85rem 1.1rem; }

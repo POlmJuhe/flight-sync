@@ -1,0 +1,22 @@
+{
+  "name": "Olm Airlines",
+  "short_name": "Olm Airlines",
+  "description": "Diari de vol personal",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a3560",
+  "theme_color": "#1a3560",
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
