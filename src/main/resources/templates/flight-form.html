@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${editMode} ? 'Editar vol · Olm Airlines' : 'Nou vol · Olm Airlines'">Vol · Olm Airlines</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -373,7 +374,7 @@
             <div class="section-header"><i class="bi bi-chat-text-fill"></i> Observacions</div>
             <div class="section-body">
                 <div class="field">
-                    <label>Remarks</label>
+                    <label>Observacions</label>
                     <textarea th:field="*{remarks}" placeholder="Notes sobre el vol..."></textarea>
                 </div>
             </div>

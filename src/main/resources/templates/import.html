@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Importar vols · Olm Airlines</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -70,6 +71,7 @@
             display: flex;
             align-items: center;
             gap: .3rem;
+            min-height: 44px;
             transition: color .15s;
         }
         .back-btn:hover { color: var(--amber); }
@@ -286,7 +288,7 @@
         <form th:action="@{/admin/import}" method="post" enctype="multipart/form-data">
             <div class="drop-zone">
                 <i class="bi bi-file-earmark-code drop-icon"></i>
-                <div class="drop-label">Exportación JSON · Private-Radar</div>
+                <div class="drop-label">Exportació JSON · Private-Radar</div>
                 <input type="file" name="file" accept=".json" required>
             </div>
             <button type="submit" class="btn-submit">

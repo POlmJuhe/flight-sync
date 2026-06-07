@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Olm Airlines</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -694,9 +695,15 @@
             .mobile-nav { top: 58px; }
         }
 
-        /* ── Small screens (portrait phones only) ── */
+        /* ── Small screens ── */
         @media (max-width: 640px) {
             .content { padding: 1rem; }
+
+            /* Filter bar: 2-col grid on phones */
+            .filter-bar { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+            .filter-label { grid-column: 1 / -1; margin-bottom: -.15rem; }
+            .btn-clear-filters { grid-column: 1 / -1; justify-self: start; }
+            .filter-select { width: 100%; min-height: 40px; font-size: .9rem; }
 
             /* Hide secondary table columns */
             .flight-table thead th:nth-child(4),
@@ -718,6 +725,16 @@
             .modal-grid { grid-template-columns: 1fr; }
             .modal-body { padding: 1.1rem; }
             .modal-footer { padding: .9rem 1.1rem; }
+            .modal-body input,
+            .modal-body select { font-size: 1rem; min-height: 44px; }
+        }
+
+        /* ── Extra small ── */
+        @media (max-width: 400px) {
+            .stat-value { font-size: 1.5rem; }
+            .brand { font-size: 1rem; letter-spacing: .2em; }
+            .td-reg { font-size: .9rem; }
+            .td-route { font-size: .85rem; }
         }
     </style>
 </head>
@@ -1083,7 +1100,7 @@
         <div style="display:flex;gap:.75rem">
             <button onclick="downloadCarnet()"
                     style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;background:#c77e04;color:#ffffff;border:none;border-radius:7px;padding:.7rem 1.6rem;cursor:pointer;display:flex;align-items:center;gap:.45rem;min-height:46px">
-                <i class="bi bi-download"></i> Descarregar PNG
+                <i class="bi bi-download"></i> Descarregar
             </button>
             <button onclick="closeCarnet()"
                     style="font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;background:transparent;color:rgba(255,255,255,.65);border:1px solid rgba(255,255,255,.25);border-radius:7px;padding:.7rem 1.4rem;cursor:pointer;min-height:46px">

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<html xmlns:th="http://www.thymeleaf.org" lang="ca">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${flight.registration} + ' · Olm Airlines'">Olm Airlines</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -78,7 +79,6 @@
             border-bottom: none;
             padding: 2.4rem 2rem 2rem;
             position: relative;
-            overflow: hidden;
         }
         .flight-hero::before {
             content: '';
@@ -557,7 +557,7 @@
             font-family: 'Outfit', sans-serif;
             min-height: 48px;
         }
-        .dropdown-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+        .dropdown-item:hover { background: var(--bg-hover); color: var(--text); }
         .dropdown-item.danger:hover { background: rgba(248,113,113,.06); color: var(--red); }
         .dropdown-divider { height: 1px; background: var(--border); }
 
@@ -804,9 +804,16 @@
             .topbar { padding: 0 1rem; }
             .back-btn { font-size: .95rem; }
 
-            .flight-hero { padding: 1.5rem 1rem 1.2rem; }
-            .registration { font-size: 2.2rem; }
-            .airport-code { font-size: 1.2rem; }
+            /* Hero: stack info + actions vertically */
+            .flight-hero { padding: 1.4rem 1rem 1.1rem; }
+            .flight-hero .d-flex { flex-direction: column; gap: .9rem !important; }
+            .flight-actions { flex-wrap: wrap; gap: .5rem; }
+            .registration { font-size: 2rem; }
+            .airport-code { font-size: 1.15rem; }
+            .flight-date { font-size: .82rem; }
+
+            /* Dropdown: flip to open upward if near bottom edge */
+            .more-dropdown { right: 0; left: auto; }
 
             .page-content { padding: 1rem; }
 
@@ -816,16 +823,16 @@
             .tl-time { font-size: 1rem; }
 
             /* Info cards */
-            .info-value { font-size: 1.4rem; }
+            .info-value { font-size: 1.35rem; }
 
-            /* Crew table cells bigger touch targets */
-            .crew-table tbody td { padding: .9rem .8rem; font-size: 1rem; }
-            .crew-table thead th { padding: .6rem .8rem; }
+            /* Crew table: tighter on mobile */
+            .crew-table tbody td { padding: .9rem .75rem; font-size: .95rem; }
+            .crew-table thead th { padding: .6rem .75rem; }
             .add-crew-form { padding: 1rem; }
             .add-crew-form input,
             .add-crew-form select { font-size: 1rem; padding: .6rem .75rem; min-height: 44px; }
 
-            /* Carousel: smaller on mobile, arrows always visible */
+            /* Carousel */
             .carousel-stage { height: 210px; }
             .carousel-arrow { opacity: .85; width: 44px; height: 44px; }
             .carousel-del-btn { opacity: 1; }
@@ -836,14 +843,22 @@
             .photo-upload-form { flex-direction: column; align-items: stretch; }
             .photo-file-input { font-size: .95rem; }
 
-            /* Modal: full-width on mobile */
+            /* Modal: sheet from bottom */
             .modal-overlay { padding: .5rem; align-items: flex-end; }
-            .modal-box { border-radius: 14px 14px 0 0; max-width: 100%; }
+            .modal-box { border-radius: 14px 14px 0 0; max-width: 100%; max-height: 90vh; overflow-y: auto; }
             .modal-grid { grid-template-columns: 1fr; }
             .modal-body { padding: 1.1rem 1.1rem; }
             .modal-footer { padding: .85rem 1.1rem; }
             .modal-body input,
-            .modal-body select { font-size: 1rem; }
+            .modal-body select { font-size: 1rem; min-height: 44px; }
+        }
+
+        /* ── Extra small ── */
+        @media (max-width: 400px) {
+            .registration { font-size: 1.65rem; }
+            .route-display { gap: .55rem; }
+            .airport-code { font-size: 1rem; }
+            .info-value { font-size: 1.15rem; }
         }
     </style>
 </head>
@@ -883,7 +898,7 @@
             <div class="flight-actions" style="align-items:center">
                 <span class="type-chip" th:text="${flight.flightType}">INSTR</span>
                 <div style="position:relative">
-                    <button class="btn-more" onclick="toggleMore()" title="Opciones">
+                    <button class="btn-more" onclick="toggleMore()" title="Opcions">
                         <i class="bi bi-three-dots"></i>
                     </button>
                     <div class="more-dropdown" id="moreDropdown">

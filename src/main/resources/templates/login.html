@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Olm Airlines · Accés</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg:        #eef2f7;
+            --bg-card:   #ffffff;
+            --border:    #cdd8e6;
+            --border-hi: #a4bad0;
+            --text:      #0d1e35;
+            --muted:     #486480;
+            --faint:     #8fadc6;
+            --amber:     #c77e04;
+            --amber-gold:#f0c060;
+            --amber-dim: rgba(199,126,4,.10);
+            --sky:       #0369a1;
+            --navy:      #1a3560;
+            --navy-deep: #112347;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ── Background atmosphere ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 60% at 15% 20%, rgba(26,53,96,.14) 0%, transparent 65%),
+                radial-gradient(ellipse 50% 50% at 85% 80%, rgba(199,126,4,.07) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        /* ── Grid pattern overlay ── */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(26,53,96,.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26,53,96,.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* ── Runway stripe decorations ── */
+        .runway-left, .runway-right {
+            position: fixed;
+            top: 0; bottom: 0;
+            width: 3px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .runway-left {
+            left: 3rem;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 18px,
+                rgba(26,53,96,.09) 18px,
+                rgba(26,53,96,.09) 34px
+            );
+        }
+        .runway-right {
+            right: 3rem;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 18px,
+                rgba(199,126,4,.08) 18px,
+                rgba(199,126,4,.08) 34px
+            );
+        }
+
+        /* ── Wrapper ── */
+        .login-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 1.5rem;
+            animation: rise-in .5s cubic-bezier(.22,.68,0,1.2) both;
+        }
+        @keyframes rise-in {
+            from { opacity: 0; transform: translateY(22px) scale(.98); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ── Brand header ── */
+        .login-brand {
+            text-align: center;
+            margin-bottom: 2rem;
+            animation: rise-in .5s .08s cubic-bezier(.22,.68,0,1.2) both;
+        }
+        .brand-icon-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            background: var(--navy);
+            box-shadow: 0 4px 20px rgba(26,53,96,.35);
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        .brand-icon-wrap i {
+            color: var(--amber-gold);
+            font-size: 1.6rem;
+        }
+        .brand-pulse {
+            position: absolute;
+            top: 8px; right: 8px;
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--amber-gold);
+            box-shadow: 0 0 0 0 rgba(240,192,96,.5);
+            animation: beacon 2.4s ease-in-out infinite;
+        }
+        @keyframes beacon {
+            0%   { box-shadow: 0 0 0 0 rgba(240,192,96,.5); }
+            60%  { box-shadow: 0 0 0 6px rgba(240,192,96,0); }
+            100% { box-shadow: 0 0 0 0 rgba(240,192,96,0); }
+        }
+        .brand-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 800;
+            letter-spacing: .28em;
+            color: var(--navy);
+            text-transform: uppercase;
+            line-height: 1;
+        }
+        .brand-sub {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .68rem;
+            color: var(--faint);
+            letter-spacing: .14em;
+            margin-top: .3rem;
+        }
+
+        /* ── Card ── */
+        .login-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 8px 40px rgba(26,53,96,.12), 0 1px 3px rgba(26,53,96,.06);
+            overflow: hidden;
+            animation: rise-in .5s .15s cubic-bezier(.22,.68,0,1.2) both;
+        }
+
+        /* Amber top accent */
+        .login-card-accent {
+            height: 3px;
+            background: linear-gradient(90deg, var(--amber), var(--amber-gold), var(--amber));
+        }
+
+        .login-card-body {
+            padding: 2rem 2rem 1.75rem;
+        }
+
+        /* ── Card title ── */
+        .login-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+        .login-title i { color: var(--amber); font-size: 1rem; }
+
+        /* ── Alert (error / logout) ── */
+        .login-alert {
+            border-radius: 7px;
+            padding: .7rem 1rem;
+            font-size: .9rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            margin-bottom: 1.2rem;
+        }
+        .login-alert-err {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            color: #c0392b;
+        }
+        .login-alert-ok {
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            color: #047857;
+        }
+
+        /* ── Field group ── */
+        .field-group {
+            margin-bottom: 1rem;
+        }
+        .field-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: .68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .16em;
+            color: var(--faint);
+            display: block;
+            margin-bottom: .3rem;
+        }
+        .field-wrap {
+            position: relative;
+        }
+        .field-icon {
+            position: absolute;
+            left: .85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--faint);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color .15s;
+        }
+        .field-input {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            border-radius: 8px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            padding: .7rem .9rem .7rem 2.6rem;
+            width: 100%;
+            min-height: 46px;
+            transition: border-color .15s, box-shadow .15s;
+            outline: none;
+        }
+        .field-input::placeholder { color: var(--faint); }
+        .field-input:focus {
+            border-color: var(--amber);
+            box-shadow: 0 0 0 3px rgba(199,126,4,.10);
+        }
+        .field-input:focus + .field-icon,
+        .field-wrap:focus-within .field-icon { color: var(--amber); }
+
+        /* Password toggle */
+        .field-toggle {
+            position: absolute;
+            right: .85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--faint);
+            font-size: .95rem;
+            cursor: pointer;
+            padding: .15rem;
+            line-height: 1;
+            transition: color .15s;
+        }
+        .field-toggle:hover { color: var(--muted); }
+
+        /* ── Submit ── */
+        .login-btn {
+            width: 100%;
+            background: var(--navy);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            letter-spacing: .2em;
+            text-transform: uppercase;
+            padding: .8rem 1.5rem;
+            min-height: 48px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .5rem;
+            margin-top: 1.5rem;
+            transition: background .15s, box-shadow .15s, transform .1s;
+        }
+        .login-btn:hover {
+            background: #24488a;
+            box-shadow: 0 4px 20px rgba(26,53,96,.3);
+        }
+        .login-btn:active { transform: scale(.98); }
+        .login-btn i { font-size: .9rem; }
+
+        /* ── Footer ── */
+        .login-card-footer {
+            padding: .85rem 2rem;
+            border-top: 1px solid var(--border);
+            background: #f7fafd;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+        .login-footer-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--amber);
+            flex-shrink: 0;
+        }
+        .login-footer-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .62rem;
+            color: var(--faint);
+            letter-spacing: .06em;
+        }
+
+        /* ── Bottom watermark ── */
+        .login-watermark {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: .62rem;
+            color: var(--border-hi, #a4bad0);
+            letter-spacing: .1em;
+            animation: rise-in .5s .25s cubic-bezier(.22,.68,0,1.2) both;
+        }
+
+        @media (max-width: 480px) {
+            .runway-left, .runway-right { display: none; }
+            .login-wrap { padding: 1rem; }
+            .login-brand { margin-bottom: 1.4rem; }
+            .brand-name { font-size: 1.4rem; letter-spacing: .2em; }
+            .brand-icon-wrap { width: 48px; height: 48px; }
+            .brand-icon-wrap i { font-size: 1.35rem; }
+            .login-card-body { padding: 1.5rem 1.25rem 1.25rem; }
+            .login-card-footer { padding: .75rem 1.25rem; }
+            .login-btn { font-size: .9rem; }
+        }
+
+        @media (max-height: 600px) {
+            .login-brand { margin-bottom: 1rem; }
+            .brand-icon-wrap { width: 40px; height: 40px; margin-bottom: .6rem; }
+            .login-card-body { padding: 1.2rem 1.5rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="runway-left"></div>
+<div class="runway-right"></div>
+
+<div class="login-wrap">
+
+    <!-- Brand -->
+    <div class="login-brand">
+        <div class="brand-icon-wrap">
+            <i class="bi bi-compass"></i>
+            <span class="brand-pulse"></span>
+        </div>
+        <div class="brand-name">Olm Airlines</div>
+    </div>
+
+    <!-- Card -->
+    <div class="login-card">
+        <div class="login-card-accent"></div>
+        <div class="login-card-body">
+            <div class="login-title">
+                <i class="bi bi-shield-lock-fill"></i>
+                Accés al sistema
+            </div>
+
+            <!-- Error -->
+            <div th:if="${param.error}" class="login-alert login-alert-err">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                Credencials incorrectes. Torna-ho a intentar.
+            </div>
+
+            <!-- Logout -->
+            <div th:if="${param.logout}" class="login-alert login-alert-ok">
+                <i class="bi bi-check-circle-fill"></i>
+                Sessió tancada correctament.
+            </div>
+
+            <form th:action="@{/login}" method="post" autocomplete="off">
+
+                <div class="field-group">
+                    <label class="field-label" for="username">Usuari</label>
+                    <div class="field-wrap">
+                        <input id="username" name="username" type="text"
+                               class="field-input" placeholder="nom d'usuari"
+                               autocomplete="username" autofocus>
+                        <i class="bi bi-person field-icon"></i>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="password">Contrasenya</label>
+                    <div class="field-wrap">
+                        <input id="password" name="password" type="password"
+                               class="field-input" placeholder="••••••••"
+                               autocomplete="current-password">
+                        <i class="bi bi-lock field-icon"></i>
+                        <button type="button" class="field-toggle" id="togglePwd"
+                                onclick="togglePassword()" tabindex="-1" title="Mostrar/amagar">
+                            <i class="bi bi-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    <i class="bi bi-box-arrow-in-right"></i>
+                    Entrar
+                </button>
+
+            </form>
+        </div>
+
+        <div class="login-card-footer">
+            <div class="login-footer-dot"></div>
+            <span class="login-footer-text">CONNEXIÓ SEGURA · OLM AIRLINES v1.0</span>
+        </div>
+    </div>
+
+
+</div>
+
+<script>
+    function togglePassword() {
+        var input = document.getElementById('password');
+        var icon  = document.getElementById('toggleIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.className = 'bi bi-eye-slash';
+        } else {
+            input.type = 'password';
+            icon.className = 'bi bi-eye';
+        }
+    }
+</script>
+</body>
+</html>
